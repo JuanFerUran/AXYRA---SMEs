@@ -5,6 +5,7 @@ import { Plus, Search, Download, TrendingUp } from 'lucide-react';
 import { useClients } from '@/features/clients/hooks/useClients';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { ClientList } from '@/features/clients/ui/client-card';
+import { ClientModal } from '@/features/clients/ui/client-modal';
 import { StatCard, GradientCard } from '@/components/animations/animated-cards';
 import { AnimatedChart } from '@/components/animations/animated-chart';
 import { MotionContainer, MotionItem } from '@/components/animations/motion';
@@ -100,7 +101,10 @@ export default function ClientsPage() {
     [companyId, searchQuery, statusFilter, activeFilter, countryFilter, minLifetimeValue, maxLifetimeValue, sortBy, sortOrder]
   );
 
-  const { clients, isLoading, deleteClient } = useClients({
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<ClientWithRelations | null>(null);
+
+  const { clients, isLoading, deleteClient, createClient, updateClient } = useClients({
     filters,
     autoFetch: Boolean(companyId),
   });
@@ -157,6 +161,21 @@ export default function ClientsPage() {
     [deleteClient]
   );
 
+  const openNewClientModal = () => {
+    setSelectedClient(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditClientModal = (client: ClientWithRelations) => {
+    setSelectedClient(client);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedClient(null);
+  };
+
   const clearFilters = () => {
     setSearchQuery('');
     setStatusFilter('');
@@ -188,7 +207,7 @@ export default function ClientsPage() {
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <Button variant="default" className="w-full" onClick={() => window.location.assign('/dashboard/clients/new')}>
+            <Button variant="default" className="w-full" onClick={openNewClientModal}>
               <Plus className="h-4 w-4" /> Nuevo cliente
             </Button>
             <Button variant="secondary" className="w-full" onClick={() => window.location.reload()}>
@@ -462,6 +481,7 @@ export default function ClientsPage() {
               <ClientList
                 clients={clients}
                 isLoading={isLoading}
+                onEdit={openEditClientModal}
                 onDelete={handleDelete}
                 onClick={(client) => window.location.assign(`/dashboard/clients/${client.id}`)}
                 variant={viewMode === 'list' ? 'list' : 'grid'}
@@ -470,6 +490,15 @@ export default function ClientsPage() {
           )}
         </div>
       </MotionItem>
+      <ClientModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        companyId={companyId ?? ''}
+        initialClient={selectedClient}
+        createClient={createClient}
+        updateClient={updateClient}
+        onSaveSuccess={() => setSelectedClient(null)}
+      />
     </MotionContainer>
   );
 }
