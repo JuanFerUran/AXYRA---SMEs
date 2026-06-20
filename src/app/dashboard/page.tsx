@@ -1,0 +1,266 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { useMemo } from 'react';
+import {
+  Users,
+  TrendingUp,
+  ShoppingCart,
+  Clock,
+  Calendar,
+  Zap,
+  BarChart3,
+  Activity,
+} from 'lucide-react';
+import { StatCard, GradientCard } from '@/components/animations/animated-cards';
+import { AnimatedChart } from '@/components/animations/animated-chart';
+import { MotionContainer, MotionItem } from '@/components/animations/motion';
+import { DataTable } from '@/components/animations/data-table';
+import { useClients } from '@/features/clients/hooks/useClients';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
+import { ClientForm } from './clients/client-form';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+export default function DashboardPage() {
+  const { session, companyId, isLoading: authLoading } = useSupabaseAuth();
+  const { clients, isLoading } = useClients({
+    filters: companyId ? { company_id: companyId } : undefined,
+    autoFetch: Boolean(companyId),
+  });
+
+  const salesData = useMemo(
+    () => [
+      { name: 'Mon', value: 2400, sales: 1200 },
+      { name: 'Tue', value: 1398, sales: 1221 },
+      { name: 'Wed', value: 9800, sales: 2290 },
+      { name: 'Thu', value: 3908, sales: 2000 },
+      { name: 'Fri', value: 4800, sales: 2181 },
+      { name: 'Sat', value: 3800, sales: 2500 },
+    ],
+    []
+  );
+
+  const revenueData = useMemo(
+    () => [
+      { name: 'Q1', value: 45000 },
+      { name: 'Q2', value: 52000 },
+      { name: 'Q3', value: 48000 },
+      { name: 'Q4', value: 61000 },
+    ],
+    []
+  );
+
+  const topClients = [...clients]
+    .sort((a, b) => b.lifetime_value - a.lifetime_value)
+    .slice(0, 5)
+    .map((client, idx) => ({
+      id: client.id,
+      first_name: client.first_name,
+      last_name: client.last_name,
+      lifetime_value: client.lifetime_value,
+      rank: idx + 1,
+    }));
+
+  const topClientsColumns = [
+    {
+      key: 'rank' as const,
+      label: '#',
+      render: (value: number) => (
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+          {value}
+        </span>
+      ),
+    },
+    { key: 'first_name' as const, label: 'First Name' },
+    { key: 'last_name' as const, label: 'Last Name' },
+    {
+      key: 'lifetime_value' as const,
+      label: 'Lifetime Value',
+      render: (value: number) => `$${value.toLocaleString()}`,
+    },
+  ];
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Cargando sesión...</p>
+      </div>
+    );
+  }
+
+  return (
+    <motion.div
+      className="min-h-screen bg-background p-6 md:p-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Welcome Banner */}
+      <MotionItem className="mb-8">
+        <GradientCard gradient="blue" className="relative overflow-hidden">
+          <div className="relative z-10">
+            <h1 className="text-3xl font-bold">Welcome back! 👋</h1>
+            <p className="mt-2 text-white/80">
+              {session?.user.email
+                ? `Signed in as ${session.user.email}`
+                : "Here's what's happening with your business today"}
+            </p>
+            {companyId && (
+              <p className="mt-2 text-white/80">Company ID: {companyId}</p>
+            )}
+          </div>
+          <motion.div
+            className="absolute right -10 top -10 h-40 w-40 rounded-full bg-white/10"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+          />
+        </GradientCard>
+      </MotionItem>
+
+      {/* KPI Cards */}
+      <MotionItem className="mb-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Total Clients"
+            value={clients.length}
+            icon={<Users className="h-5 w-5" />}
+            subtext="All time"
+            delay={0}
+          />
+          <StatCard
+            title="Active Clients"
+            value={clients.filter((c) => c.is_active).length}
+            icon={<Activity className="h-5 w-5" />}
+            subtext="Currently active"
+            trend={8}
+            delay={0.1}
+          />
+          <StatCard
+            title="Total Revenue"
+            value={`$${clients.reduce((sum, c) => sum + c.lifetime_value, 0).toLocaleString()}`}
+            icon={<TrendingUp className="h-5 w-5" />}
+            subtext="Lifetime value"
+            trend={12}
+            delay={0.2}
+          />
+          <StatCard
+            title="Avg. Order Value"
+            value={`$${(clients.reduce((sum, c) => sum + c.lifetime_value, 0) / clients.length || 0).toFixed(0)}`}
+            icon={<ShoppingCart className="h-5 w-5" />}
+            subtext="Per transaction"
+            delay={0.3}
+          />
+        </div>
+      </MotionItem>
+
+      {/* Charts Section */}
+      <MotionItem className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <AnimatedChart
+          data={salesData}
+          type="line"
+          dataKey="value"
+          title="Weekly Sales Performance"
+          height={300}
+          delay={0.2}
+        />
+        <AnimatedChart
+          data={revenueData}
+          type="bar"
+          dataKey="value"
+          title="Quarterly Revenue"
+          height={300}
+          delay={0.3}
+        />
+      </MotionItem>
+
+      {/* Additional Info */}
+      <MotionItem className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Pending Orders</p>
+              <p className="mt-2 text-2xl font-bold">24</p>
+            </div>
+            <Clock className="h-8 w-8 text-yellow-500 opacity-20" />
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Birthdays This Week</p>
+              <p className="mt-2 text-2xl font-bold">5</p>
+            </div>
+            <Calendar className="h-8 w-8 text-blue-500 opacity-20" />
+          </div>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Automations Running</p>
+              <p className="mt-2 text-2xl font-bold">12</p>
+            </div>
+            <Zap className="h-8 w-8 text-green-500 opacity-20" />
+          </div>
+        </div>
+      </MotionItem>
+
+      {/* Top Clients Table */}
+      <MotionItem className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-lg font-semibold">Top Clients</h2>
+        <DataTable
+          columns={topClientsColumns}
+          data={topClients}
+          isLoading={isLoading}
+        />
+      </MotionItem>
+
+      {/* New Client Form */}
+      {companyId && (
+        <MotionItem className="rounded-lg border border-border bg-card p-6">
+          <ClientForm companyId={companyId} />
+        </MotionItem>
+      )}
+
+      {/* Quick Actions */}
+      <MotionItem className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <motion.button
+          className="rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-left text-white transition-all hover:shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-90">Create New</p>
+              <p className="mt-1 text-xl font-semibold">Automation</p>
+            </div>
+            <Zap className="h-6 w-6 opacity-50" />
+          </div>
+        </motion.button>
+
+        <motion.button
+          className="rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 p-6 text-left text-white transition-all hover:shadow-lg"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm opacity-90">View</p>
+              <p className="mt-1 text-xl font-semibold">Analytics</p>
+            </div>
+            <BarChart3 className="h-6 w-6 opacity-50" />
+          </div>
+        </motion.button>
+      </MotionItem>
+    </motion.div>
+  );
+}
