@@ -29,9 +29,17 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
+    const redirectTo =
+      process.env.NEXT_PUBLIC_VERCEL_URL && process.env.NEXT_PUBLIC_VERCEL_URL !== 'localhost'
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        : window.location.origin;
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        redirectTo,
+      },
     });
     setIsLoading(false);
 
