@@ -75,6 +75,28 @@ export default function RegisterPage() {
         <CardContent className="px-8 pb-8">
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700">Nombre</label>
+              <Input
+                type="text"
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
+                placeholder="Tu nombre"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700">Apellido</label>
+              <Input
+                type="text"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
+                placeholder="Tu apellido"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">Correo electrónico</label>
               <Input
                 type="email"
