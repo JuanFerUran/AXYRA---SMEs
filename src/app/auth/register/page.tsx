@@ -31,36 +31,54 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    const emailRedirectTo =
-      process.env.NEXT_PUBLIC_VERCEL_URL && process.env.NEXT_PUBLIC_VERCEL_URL !== 'localhost'
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
-        : `${window.location.origin}/auth/callback`;
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo,
-        data: {
-          first_name: firstName || null,
-          last_name: lastName || null,
+    try {
+      // Sign up with metadata
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName || null,
+            last_name: lastName || null,
+          },
         },
-      },
-    });
-    setIsLoading(false);
+      });
 
-    if (error) {
-      setErrorMessage(error.message);
-      return;
+      if (signUpError) {
+        setErrorMessage(signUpError.message);
+        setIsLoading(false);
+        return;
+      }
+
+      // If signup was successful, attempt to sign in immediately
+      if (signUpData?.user) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          // Signup worked but signin failed - user needs to confirm email
+          setFeedback('Cuenta creada. Por favor, confirma tu correo para continuar.');
+          setIsLoading(false);
+          return;
+        }
+
+        if (signInData?.session) {
+          // Success! User is now logged in
+          router.push('/dashboard');
+          return;
+        }
+      }
+
+      setFeedback('Registro exitoso. Intenta iniciar sesión.');
+      setIsLoading(false);
+    } catch (err) {
+      console.error('Register error:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Error desconocido');
+      setIsLoading(false);
     }
-
-    // We rely on a Supabase DB trigger to create the `profiles` row and assign role 'admin'.
-    if (data?.session) {
-      router.push('/dashboard');
-      return;
-    }
-
-    setFeedback('Registro exitoso. Revisa tu correo para confirmar tu cuenta.');
   };
 
   return (
