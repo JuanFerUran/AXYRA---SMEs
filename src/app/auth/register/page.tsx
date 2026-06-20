@@ -33,8 +33,8 @@ export default function RegisterPage() {
     setIsLoading(true);
     const emailRedirectTo =
       process.env.NEXT_PUBLIC_VERCEL_URL && process.env.NEXT_PUBLIC_VERCEL_URL !== 'localhost'
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : window.location.origin;
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
+        : `${window.location.origin}/auth/callback`;
 
     const { data, error } = await supabase.auth.signUp({
       email,
