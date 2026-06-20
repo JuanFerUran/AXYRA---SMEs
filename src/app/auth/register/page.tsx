@@ -48,7 +48,21 @@ export default function RegisterPage() {
       return;
     }
 
-    if (data.session) {
+    // If we have a user id immediately after signUp, create the profile with admin role
+    try {
+      const userId = data?.user?.id ?? null;
+      if (userId) {
+        await fetch('/api/auth/create-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, email, role: 'admin' }),
+        });
+      }
+    } catch (err) {
+      console.warn('Failed to create profile after signUp', err);
+    }
+
+    if (data?.session) {
       router.push('/dashboard');
       return;
     }
