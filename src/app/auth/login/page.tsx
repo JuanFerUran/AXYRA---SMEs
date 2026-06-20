@@ -32,19 +32,35 @@ export default function LoginPage() {
     setErrorMessage(null);
     setIsLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      console.log('Intentando login con:', email);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    setIsLoading(false);
+      console.log('Respuesta login:', { data, error });
 
-    if (error) {
-      setErrorMessage(error.message);
-      return;
+      if (error) {
+        console.error('Error de login:', error);
+        setErrorMessage(error.message || 'Error al iniciar sesión');
+        setIsLoading(false);
+        return;
+      }
+
+      if (data?.session) {
+        console.log('Sesión exitosa, redirigiendo...');
+        router.push('/dashboard');
+      } else {
+        setErrorMessage('No se pudo iniciar sesión. Intenta de nuevo.');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('Error en handleSubmit:', err);
+      setErrorMessage(err instanceof Error ? err.message : 'Error desconocido');
+      setIsLoading(false);
     }
-
-    router.push('/dashboard');
   };
 
   return (
