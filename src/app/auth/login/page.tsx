@@ -50,8 +50,11 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        console.log('Sesión exitosa, redirigiendo...');
-        router.push('/dashboard');
+        console.log('Sesión exitosa, esperando confirmación...');
+        // Wait a bit to ensure session is fully established
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('Redirigiendo a dashboard...');
+        router.replace('/dashboard');
       } else {
         setErrorMessage('No se pudo iniciar sesión. Intenta de nuevo.');
         setIsLoading(false);
