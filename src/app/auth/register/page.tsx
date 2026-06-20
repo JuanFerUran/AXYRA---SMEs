@@ -12,6 +12,8 @@ import { AlertTriangle } from 'lucide-react';
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +41,10 @@ export default function RegisterPage() {
       password,
       options: {
         emailRedirectTo,
+        data: {
+          first_name: firstName || null,
+          last_name: lastName || null,
+        },
       },
     });
     setIsLoading(false);
@@ -48,20 +54,7 @@ export default function RegisterPage() {
       return;
     }
 
-    // If we have a user id immediately after signUp, create the profile with admin role
-    try {
-      const userId = data?.user?.id ?? null;
-      if (userId) {
-        await fetch('/api/auth/create-profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, email, role: 'admin' }),
-        });
-      }
-    } catch (err) {
-      console.warn('Failed to create profile after signUp', err);
-    }
-
+    // We rely on a Supabase DB trigger to create the `profiles` row and assign role 'admin'.
     if (data?.session) {
       router.push('/dashboard');
       return;

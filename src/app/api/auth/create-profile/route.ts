@@ -10,6 +10,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
     }
 
+    // Require an internal secret header to prevent arbitrary external calls
+    const internalSecret = request.headers.get('x-internal-secret') || '';
+    const expectedSecret = process.env.INTERNAL_API_KEY || '';
+    if (!expectedSecret || internalSecret !== expectedSecret) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const body = await request.json();
     const { userId, email, first_name = null, last_name = null, role = 'admin' } = body;
 
