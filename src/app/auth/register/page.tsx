@@ -29,7 +29,7 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    const redirectTo =
+    const emailRedirectTo =
       process.env.NEXT_PUBLIC_VERCEL_URL && process.env.NEXT_PUBLIC_VERCEL_URL !== 'localhost'
         ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
         : window.location.origin;
@@ -38,7 +38,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        redirectTo,
+        emailRedirectTo,
       },
     });
     setIsLoading(false);
