@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabaseAdmin.from('profiles').upsert(payload, { returning: 'representation' });
+    const { data, error } = await supabaseAdmin.from('profiles').upsert(payload).select();
 
     if (error) {
       console.error('create-profile error:', error);
