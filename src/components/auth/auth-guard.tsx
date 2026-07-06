@@ -13,7 +13,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     let active = true;
 
     const verifySession = async () => {
-      const {\n        data: { session },
+      const {
+        data: { session },
       } = await supabase.auth.getSession();
 
       if (!active) return;
