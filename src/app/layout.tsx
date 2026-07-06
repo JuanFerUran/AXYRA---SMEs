@@ -18,6 +18,8 @@ export const metadata: Metadata = {
   description: 'Platform for SMEs Business Intelligence and Automation',
 };
 
+import { AuthGuard } from '@/components/auth/auth-guard';
+
 export default function RootLayout({
   children,
 }: {
@@ -26,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider>
+          <AuthGuard>{children}</AuthGuard>
+        </TooltipProvider>
       </body>
     </html>
   );
