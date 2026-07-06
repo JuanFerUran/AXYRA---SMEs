@@ -44,7 +44,7 @@ function NavigationMenuContent({ className, children, ...props }: React.HTMLAttr
     <div
       data-slot="navigation-menu-content"
       className={cn(
-        "absolute left-0 top-full z-50 mt-2 min-w-[12rem] rounded-lg border border-border bg-popover shadow-lg",
+        "absolute left-0 top-full z-50 mt-2 min-w-48 rounded-lg border border-border bg-popover shadow-lg",
         className
       )}
       {...props}

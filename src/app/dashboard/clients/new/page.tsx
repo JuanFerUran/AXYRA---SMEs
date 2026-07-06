@@ -99,7 +99,7 @@ export default function NewClientPage() {
                 Completa los campos para registrar un cliente nuevo en el sistema. Esta información se integrará con tus reportes y automatizaciones.
               </p>
             </div>
-            <div className="inline-flex items-center gap-3 rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-4 text-white shadow-lg shadow-blue-500/10">
+            <div className="inline-flex items-center gap-3 rounded-3xl bg-linear-to-r from-blue-500 to-cyan-500 px-5 py-4 text-white shadow-lg shadow-blue-500/10">
               <PlusCircle className="h-7 w-7" />
               <span className="text-sm font-semibold">Cliente nuevo</span>
             </div>

@@ -53,7 +53,7 @@ export default function DashboardLayout({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-purple-600">
               <span className="text-lg font-bold text-white">BIA</span>
             </div>
             <span className="text-lg font-bold">BIA Platform</span>
@@ -127,7 +127,7 @@ export default function DashboardLayout({
                 <Bell className="h-5 w-5 text-muted-foreground" />
               </motion.button>
 
-              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600" />
+              <div className="h-10 w-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600" />
 
               <motion.button
                 className="flex h-10 w-10 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted md:hidden"

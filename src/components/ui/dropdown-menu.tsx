@@ -46,7 +46,7 @@ function DropdownMenuContent({
   return (
     <div
       className={cn(
-        "absolute z-50 mt-2 min-w-[10rem] overflow-hidden rounded-lg border border-border bg-popover shadow-lg",
+        "absolute z-50 mt-2 min-w-40 overflow-hidden rounded-lg border border-border bg-popover shadow-lg",
         className
       )}
       {...props}
@@ -115,7 +115,7 @@ function DropdownMenuSubContent({
   return (
     <div
       className={cn(
-        "absolute left-full top-0 z-50 mt-0 min-w-[10rem] rounded-lg border border-border bg-popover shadow-lg",
+        "absolute left-full top-0 z-50 mt-0 min-w-40 rounded-lg border border-border bg-popover shadow-lg",
         className
       )}
       {...props}

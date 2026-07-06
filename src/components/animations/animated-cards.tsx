@@ -108,7 +108,7 @@ export function GradientCard({
 
   return (
     <motion.div
-      className={`bg-gradient-to-r ${gradientClass} rounded-lg p-6 text-white shadow-lg ${className}`}
+      className={`bg-linear-to-r ${gradientClass} rounded-lg p-6 text-white shadow-lg ${className}`}
       variants={scaleInVariants}
       initial="hidden"
       animate="visible"

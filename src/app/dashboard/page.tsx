@@ -234,7 +234,7 @@ export default function DashboardPage() {
       {/* Quick Actions */}
       <MotionItem className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
         <motion.button
-          className="rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 p-6 text-left text-white transition-all hover:shadow-lg"
+          className="rounded-lg bg-linear-to-r from-purple-500 to-pink-500 p-6 text-left text-white transition-all hover:shadow-lg"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -248,7 +248,7 @@ export default function DashboardPage() {
         </motion.button>
 
         <motion.button
-          className="rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 p-6 text-left text-white transition-all hover:shadow-lg"
+          className="rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 p-6 text-left text-white transition-all hover:shadow-lg"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
