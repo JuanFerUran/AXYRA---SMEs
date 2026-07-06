@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Header } from '@/components/common/Header';
+import { Footer } from '@/components/common/Footer';
 import './globals.css';
 
 const geist = Geist({
@@ -29,7 +31,13 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${geist.variable} ${geistMono.variable} antialiased`}>
         <TooltipProvider>
-          <AuthGuard>{children}</AuthGuard>
+          <AuthGuard>
+            <div className="flex min-h-screen flex-col bg-slate-950 text-slate-50">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </AuthGuard>
         </TooltipProvider>
       </body>
     </html>

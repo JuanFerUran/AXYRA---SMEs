@@ -40,8 +40,10 @@ export function useClients(options: UseClientsOptions = {}) {
     setError(null);
     try {
       const data = await clientService.list(mergedFilters);
-      setClients(data);
+      setClients(Array.isArray(data) ? data : []);
     } catch (err) {
+      console.error('useClients fetch failed:', err);
+      setClients([]);
       setError(err instanceof Error ? err : new Error('Failed to fetch clients'));
     } finally {
       setIsLoading(false);

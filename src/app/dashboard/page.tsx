@@ -61,13 +61,13 @@ export default function DashboardPage() {
   );
 
   const topClients = [...clients]
-    .sort((a, b) => b.lifetime_value - a.lifetime_value)
+    .sort((a, b) => (b.lifetime_value || 0) - (a.lifetime_value || 0))
     .slice(0, 5)
     .map((client, idx) => ({
       id: client.id,
-      first_name: client.first_name,
-      last_name: client.last_name,
-      lifetime_value: client.lifetime_value,
+      first_name: client.first_name || '—',
+      last_name: client.last_name || '—',
+      lifetime_value: client.lifetime_value || 0,
       rank: idx + 1,
     }));
 
@@ -139,7 +139,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Active Clients"
-            value={clients.filter((c) => c.is_active).length}
+            value={clients.filter((c) => Boolean(c.is_active)).length}
             icon={<Activity className="h-5 w-5" />}
             subtext="Currently active"
             trend={8}
@@ -147,7 +147,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Total Revenue"
-            value={`$${clients.reduce((sum, c) => sum + c.lifetime_value, 0).toLocaleString()}`}
+            value={`$${clients.reduce((sum, c) => sum + (c.lifetime_value || 0), 0).toLocaleString()}`}
             icon={<TrendingUp className="h-5 w-5" />}
             subtext="Lifetime value"
             trend={12}
@@ -155,7 +155,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Avg. Order Value"
-            value={`$${(clients.reduce((sum, c) => sum + c.lifetime_value, 0) / clients.length || 0).toFixed(0)}`}
+            value={`$${((clients.reduce((sum, c) => sum + (c.lifetime_value || 0), 0) / (clients.length || 1)) || 0).toFixed(0)}`}
             icon={<ShoppingCart className="h-5 w-5" />}
             subtext="Per transaction"
             delay={0.3}
