@@ -82,18 +82,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
-      <Card className="w-full max-w-md rounded-3xl border border-slate-200 bg-white shadow-xl">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at top left, rgba(56,189,248,0.15), transparent 18%), radial-gradient(circle at bottom right, rgba(168,85,247,0.16), transparent 25%)',
+        }}
+      />
+      <Card className="relative w-full max-w-md rounded-3xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-cyan-500/10">
         <CardHeader className="space-y-2 px-8 pt-8">
-          <CardTitle className="text-3xl">Crear cuenta</CardTitle>
-          <CardDescription>
-            Regístrate con tu correo y contraseña para comenzar a usar BIA Platform.
+          <CardTitle className="text-3xl text-white">Crear cuenta</CardTitle>
+          <CardDescription className="text-slate-300">
+            Regístrate para gestionar tu negocio con Business Intelligence y automatizaciones.
           </CardDescription>
         </CardHeader>
         <CardContent className="px-8 pb-8">
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">Nombre</label>
+              <label className="block text-sm font-medium text-slate-300">Nombre</label>
               <Input
                 type="text"
                 value={firstName}
@@ -104,7 +111,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">Apellido</label>
+              <label className="block text-sm font-medium text-slate-300">Apellido</label>
               <Input
                 type="text"
                 value={lastName}
@@ -115,7 +122,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">Correo electrónico</label>
+              <label className="block text-sm font-medium text-slate-300">Correo electrónico</label>
               <Input
                 type="email"
                 value={email}
@@ -126,7 +133,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">Contraseña</label>
+              <label className="block text-sm font-medium text-slate-300">Contraseña</label>
               <Input
                 type="password"
                 value={password}
@@ -137,7 +144,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700">Confirmar contraseña</label>
+              <label className="block text-sm font-medium text-slate-300">Confirmar contraseña</label>
               <Input
                 type="password"
                 value={confirmPassword}
@@ -148,14 +155,14 @@ export default function RegisterPage() {
             </div>
 
             {errorMessage && (
-              <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-red-700">
+              <div className="flex items-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-rose-100">
                 <AlertTriangle className="h-4 w-4" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
             {feedback && (
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-emerald-700">
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-3 text-emerald-100">
                 {feedback}
               </div>
             )}
@@ -165,9 +172,9 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-600">
+          <div className="mt-6 text-center text-sm text-slate-400">
             ¿Ya tienes cuenta?{' '}
-            <Link href="/auth/login" className="font-semibold text-primary hover:underline">
+            <Link href="/auth/login" className="font-semibold text-cyan-300 hover:text-cyan-200 hover:underline">
               Inicia sesión
             </Link>
           </div>
