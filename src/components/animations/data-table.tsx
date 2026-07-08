@@ -92,17 +92,16 @@ export function DataTable<T extends { id: string | number }>({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
+        duration: 0.15,
       },
     },
   };
 
   const rowVariants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      x: 0,
-      transition: { duration: 0.3 },
+      transition: { duration: 0.15 },
     },
   };
 

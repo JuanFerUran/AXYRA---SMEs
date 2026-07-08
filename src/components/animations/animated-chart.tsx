@@ -74,9 +74,8 @@ export function AnimatedChart({
           dataKey={dataKey}
           stroke="#3b82f6"
           strokeWidth={2}
-          dot={{ fill: '#3b82f6' }}
-          isAnimationActive={true}
-          animationDuration={800}
+          dot={false}
+          isAnimationActive={false}
         />
       </LineChart>
     ) : type === 'bar' ? (
@@ -97,8 +96,7 @@ export function AnimatedChart({
           dataKey={dataKey}
           fill="#3b82f6"
           radius={[8, 8, 0, 0]}
-          animationDuration={800}
-          isAnimationActive={true}
+          isAnimationActive={false}
         />
       </BarChart>
     ) : (
@@ -127,8 +125,7 @@ export function AnimatedChart({
           stroke="#8b5cf6"
           fill="url(#colorArea)"
           strokeWidth={2}
-          isAnimationActive={true}
-          animationDuration={800}
+          isAnimationActive={false}
         />
       </AreaChart>
     )

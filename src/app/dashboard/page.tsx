@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import { useMemo } from 'react';
 import {
   Users,
@@ -13,12 +14,37 @@ import {
   Activity,
 } from 'lucide-react';
 import { StatCard, GradientCard } from '@/components/animations/animated-cards';
-import { AnimatedChart } from '@/components/animations/animated-chart';
 import { MotionContainer, MotionItem } from '@/components/animations/motion';
 import { DataTable } from '@/components/animations/data-table';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useClients } from '@/features/clients/hooks/useClients';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
-import { ClientForm } from './clients/client-form';
+
+const AnimatedChart = dynamic(
+  () => import('@/components/animations/animated-chart').then((mod) => mod.AnimatedChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-lg border border-border bg-card p-6">
+        <Skeleton className="mb-4 h-6 w-32" />
+        <Skeleton className="h-[300px] w-full" />
+      </div>
+    ),
+  }
+);
+
+const ClientForm = dynamic(() => import('./clients/client-form').then((mod) => mod.ClientForm), {
+  ssr: false,
+  loading: () => (
+    <div className="rounded-lg border border-border bg-card p-6">
+      <Skeleton className="h-6 w-40" />
+      <div className="mt-4 space-y-3">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    </div>
+  ),
+});
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -60,16 +86,20 @@ export default function DashboardPage() {
     []
   );
 
-  const topClients = [...clients]
-    .sort((a, b) => (b.lifetime_value || 0) - (a.lifetime_value || 0))
-    .slice(0, 5)
-    .map((client, idx) => ({
-      id: client.id,
-      first_name: client.first_name || '—',
-      last_name: client.last_name || '—',
-      lifetime_value: client.lifetime_value || 0,
-      rank: idx + 1,
-    }));
+  const topClients = useMemo(
+    () =>
+      [...clients]
+        .sort((a, b) => (b.lifetime_value || 0) - (a.lifetime_value || 0))
+        .slice(0, 5)
+        .map((client, idx) => ({
+          id: client.id,
+          first_name: client.first_name || '—',
+          last_name: client.last_name || '—',
+          lifetime_value: client.lifetime_value || 0,
+          rank: idx + 1,
+        })),
+    [clients]
+  );
 
   const topClientsColumns = [
     {
@@ -101,9 +131,9 @@ export default function DashboardPage() {
   return (
     <motion.div
       className="min-h-screen bg-background p-6 md:p-8"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
     >
       {/* Welcome Banner */}
       <MotionItem className="mb-8">
