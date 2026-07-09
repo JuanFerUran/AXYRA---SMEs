@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [redirectingToLogin, setRedirectingToLogin] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,11 +34,12 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Sign up with metadata
+      // Sign up with metadata and email confirmation redirect
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             first_name: firstName || null,
             last_name: lastName || null,
@@ -46,34 +48,27 @@ export default function RegisterPage() {
       });
 
       if (signUpError) {
-        setErrorMessage(signUpError.message);
+        const message = /already registered/i.test(signUpError.message)
+          ? 'Este correo ya está registrado. Por favor inicia sesión o restablece tu contraseña.'
+          : signUpError.message;
+
+        setErrorMessage(message);
         setIsLoading(false);
         return;
       }
 
-      // If signup was successful, attempt to sign in immediately
-      if (signUpData?.user) {
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (signInError) {
-          // Signup worked but signin failed - user needs to confirm email
-          setFeedback('Cuenta creada. Por favor, confirma tu correo para continuar.');
-          setIsLoading(false);
-          return;
-        }
-
-        if (signInData?.session) {
-          // Success! User is now logged in
-          router.push('/dashboard');
-          return;
-        }
+      if (signUpData?.session) {
+        router.replace('/dashboard');
+        return;
       }
 
-      setFeedback('Registro exitoso. Intenta iniciar sesión.');
+      setFeedback(
+        'Cuenta creada. Revisa tu correo y sigue el enlace de confirmación. Te llevaremos al login en unos segundos.'
+      );
       setIsLoading(false);
+      setTimeout(() => {
+        router.replace('/auth/login');
+      }, 7000);
     } catch (err) {
       console.error('Register error:', err);
       setErrorMessage(err instanceof Error ? err.message : 'Error desconocido');
