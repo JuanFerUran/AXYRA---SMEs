@@ -13,22 +13,37 @@ export default function CallbackContent() {
     const handleCallback = async () => {
       try {
         const code = searchParams.get('code');
-        const hash = window.location.hash;
-        let sessionResult;
+        const hash = typeof window !== 'undefined' ? window.location.hash : '';
 
+        // If we have an OAuth code, exchange it
         if (code) {
-          sessionResult = await supabase.auth.exchangeCodeForSession(code);
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) {
+            setMessage(`Error: ${error.message}`);
+            setTimeout(() => router.push('/auth/login'), 3000);
+            return;
+          }
         } else if (hash) {
-          sessionResult = await supabase.auth.getSessionFromUrl();
+          // Parse tokens returned in the hash and set session
+          const params = new URLSearchParams(hash.replace('#', '?'));
+          const access_token = params.get('access_token');
+          const refresh_token = params.get('refresh_token');
+
+          if (access_token) {
+            const { error } = await supabase.auth.setSession({
+              access_token: access_token,
+              refresh_token: refresh_token ?? undefined,
+            });
+
+            if (error) {
+              setMessage(`Error: ${error.message}`);
+              setTimeout(() => router.push('/auth/login'), 3000);
+              return;
+            }
+          }
         }
 
-        if (sessionResult?.error) {
-          const errorMessage = sessionResult.error.message || 'Error al procesar la autenticación.';
-          setMessage(`Error: ${errorMessage}`);
-          setTimeout(() => router.push('/auth/login'), 3000);
-          return;
-        }
-
+        // Verify session and redirect
         const { data } = await supabase.auth.getSession();
         if (data?.session) {
           setMessage('¡Autenticación exitosa! Redirigiendo...');
