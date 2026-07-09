@@ -12,32 +12,35 @@ export default function CallbackContent() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Check if we have tokens in the URL
         const code = searchParams.get('code');
-        
+        const hash = window.location.hash;
+        let sessionResult;
+
         if (code) {
-          // Exchange code for session
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) {
-            setMessage(`Error: ${error.message}`);
-            setTimeout(() => router.push('/auth/login'), 3000);
-            return;
-          }
+          sessionResult = await supabase.auth.exchangeCodeForSession(code);
+        } else if (hash) {
+          sessionResult = await supabase.auth.getSessionFromUrl();
         }
 
-        // Check if user is now logged in
+        if (sessionResult?.error) {
+          const errorMessage = sessionResult.error.message || 'Error al procesar la autenticación.';
+          setMessage(`Error: ${errorMessage}`);
+          setTimeout(() => router.push('/auth/login'), 3000);
+          return;
+        }
+
         const { data } = await supabase.auth.getSession();
-        
         if (data?.session) {
           setMessage('¡Autenticación exitosa! Redirigiendo...');
           setTimeout(() => router.push('/dashboard'), 1000);
-        } else {
-          setMessage('No se pudo establecer la sesión. Intenta de nuevo.');
-          setTimeout(() => router.push('/auth/login'), 3000);
+          return;
         }
+
+        setMessage('No se pudo establecer la sesión. Te redirigiremos al login.');
+        setTimeout(() => router.push('/auth/login'), 3000);
       } catch (err) {
         console.error('Callback error:', err);
-        setMessage('Error durante la autenticación.');
+        setMessage('Error durante la autenticación. Te redirigiremos al login.');
         setTimeout(() => router.push('/auth/login'), 3000);
       }
     };
