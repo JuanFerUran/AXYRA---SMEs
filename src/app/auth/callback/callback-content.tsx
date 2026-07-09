@@ -30,10 +30,9 @@ export default function CallbackContent() {
           const refresh_token = params.get('refresh_token');
 
           if (access_token) {
-            const { error } = await supabase.auth.setSession({
-              access_token: access_token,
-              refresh_token: refresh_token ?? undefined,
-            });
+            const payload: any = { access_token };
+            if (refresh_token) payload.refresh_token = refresh_token;
+            const { error } = await supabase.auth.setSession(payload);
 
             if (error) {
               setMessage(`Error: ${error.message}`);
