@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import { completeRegistration } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -34,7 +35,7 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      // Sign up with metadata and email confirmation redirect
+      // 1. Sign up with metadata and email confirmation redirect
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -57,11 +58,36 @@ export default function RegisterPage() {
         return;
       }
 
-      if (signUpData?.session) {
-        router.replace('/dashboard');
+      // Get the auth user ID
+      const authUserId = signUpData?.user?.id;
+      if (!authUserId) {
+        setErrorMessage('Error: No se pudo obtener el ID de usuario');
+        setIsLoading(false);
         return;
       }
 
+      // 2. Complete registration by creating company, user, roles, etc.
+      try {
+        await completeRegistration(authUserId, email, firstName, lastName);
+      } catch (registrationError) {
+        console.error('Registration completion error:', registrationError);
+        setErrorMessage(
+          `Cuenta creada pero hubo un error al completar el registro: ${registrationError instanceof Error ? registrationError.message : 'Error desconocido'}`
+        );
+        setIsLoading(false);
+        return;
+      }
+
+      // 3. If user has session immediately (no email confirmation needed), redirect to dashboard
+      if (signUpData?.session) {
+        setFeedback('¡Cuenta creada exitosamente! Redirigiendo al dashboard...');
+        setTimeout(() => {
+          router.replace('/dashboard');
+        }, 1000);
+        return;
+      }
+
+      // 4. Otherwise, show message about email confirmation
       setFeedback(
         'Cuenta creada. Revisa tu correo y sigue el enlace de confirmación. Te llevaremos al login en unos segundos.'
       );

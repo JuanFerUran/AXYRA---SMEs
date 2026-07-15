@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
+import { updateLoginTimestamp } from '@/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -50,7 +51,17 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
-        console.log('Sesión exitosa, esperando confirmación...');
+        const authUserId = data.session.user.id;
+        console.log('Sesión exitosa, actualizando timestamp de login...');
+        
+        try {
+          await updateLoginTimestamp(authUserId);
+          console.log('Timestamp actualizado correctamente');
+        } catch (timestampError) {
+          console.error('Error actualizando timestamp:', timestampError);
+          // Don't fail the login, just log the error
+        }
+
         // Wait a bit to ensure session is fully established
         await new Promise(resolve => setTimeout(resolve, 1000));
         console.log('Redirigiendo a dashboard...');
