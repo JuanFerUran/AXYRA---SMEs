@@ -12,9 +12,9 @@ export class ClientSupabaseRepository implements IClientRepository {
   private table = 'clients';
 
   async create(data: CreateClientInput): Promise<Client> {
-    const { data: row, error } = await supabase
+    const { data: row, error } = await (supabase as any)
       .from(this.table)
-      .insert([data as Record<string, unknown>])
+      .insert([data])
       .select()
       .single();
 
