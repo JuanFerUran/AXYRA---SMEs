@@ -248,7 +248,7 @@ export class ClientSupabaseRepository implements IClientRepository {
   }
 
   async updateClientStatus(id: string, statusId: string): Promise<Client> {
-    const { data: row, error } = await supabase
+    const { data: row, error } = await (supabase as any)
       .from(this.table)
       .update({ client_status_id: statusId })
       .eq('id', id)
@@ -260,7 +260,7 @@ export class ClientSupabaseRepository implements IClientRepository {
   }
 
   async bulkUpdateStatus(ids: string[], statusId: string): Promise<number> {
-    const { error, data } = await supabase
+    const { error, data } = await (supabase as any)
       .from(this.table)
       .update({ client_status_id: statusId })
       .in('id', ids)
