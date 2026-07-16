@@ -123,7 +123,7 @@ export class ClientSupabaseRepository implements IClientRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from(this.table)
       .update({ deleted_at: new Date().toISOString() })
       .eq('id', id);
