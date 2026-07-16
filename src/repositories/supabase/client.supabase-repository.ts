@@ -112,7 +112,7 @@ export class ClientSupabaseRepository implements IClientRepository {
   }
 
   async update(id: string, dataInput: UpdateClientInput): Promise<Client> {
-    const { data: row, error } = await supabase
+    const { data: row, error } = await (supabase as any)
       .from(this.table)
       .update(dataInput)
       .eq('id', id)
