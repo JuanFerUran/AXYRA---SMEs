@@ -232,7 +232,7 @@ export class ClientSupabaseRepository implements IClientRepository {
     averageOrderValue: number;
     averageClientsPerMonth: number;
   }> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .rpc('get_client_stats', { p_company_id: companyId });
 
     if (error) throw error;
