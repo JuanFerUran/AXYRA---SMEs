@@ -247,20 +247,28 @@ export async function completeRegistration(
 }
 
 export async function updateLoginTimestamp(authUserId: string) {
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.warn('Skipping login timestamp update because Supabase admin env vars are missing.');
+    return { success: false, skipped: true, reason: 'missing_env' };
+  }
+
   try {
-    // 1. Get user from users table
     const { data: user, error: getUserError } = await supabaseAdmin
       .from('users')
-      .select('*')
+      .select('id')
       .eq('id', authUserId)
-      .single();
+      .maybeSingle();
 
     if (getUserError) {
-      console.error('User not found:', getUserError);
-      throw new Error('Usuario no encontrado en la base de datos');
+      console.warn('Login timestamp lookup skipped:', getUserError.message);
+      return { success: false, skipped: true, reason: 'lookup_error' };
     }
 
-    // 2. Update last_login_at
+    if (!user) {
+      console.info('No user row found for login timestamp update; continuing without it.');
+      return { success: false, skipped: true, reason: 'user_not_found' };
+    }
+
     const { error: updateError } = await supabaseAdmin
       .from('users')
       .update({
@@ -269,16 +277,16 @@ export async function updateLoginTimestamp(authUserId: string) {
       .eq('id', authUserId);
 
     if (updateError) {
-      console.error('Error updating login timestamp:', updateError);
-      throw new Error('No se pudo actualizar la hora de login');
+      console.warn('Login timestamp update skipped:', updateError.message);
+      return { success: false, skipped: true, reason: 'update_error' };
     }
 
     return {
       success: true,
-      user,
+      skipped: false,
     };
   } catch (error) {
-    console.error('Login timestamp update error:', error);
-    throw error;
+    console.warn('Login timestamp update skipped due to unexpected error:', error);
+    return { success: false, skipped: true, reason: 'unexpected_error' };
   }
 }

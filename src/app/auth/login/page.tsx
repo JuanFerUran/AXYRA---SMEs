@@ -57,16 +57,13 @@ export default function LoginPage() {
         console.log('Session recibida en signInWithPassword:', data.session);
         const authUserId = data.session.user.id;
         console.log('Sesión exitosa, actualizando timestamp de login...');
-        
-        try {
-          await updateLoginTimestamp(authUserId);
-          console.log('Timestamp actualizado correctamente');
-        } catch (timestampError) {
+
+        void updateLoginTimestamp(authUserId).catch((timestampError) => {
           console.error('Error actualizando timestamp:', timestampError);
-          // Don't fail the login, just log the error
-        }
+        });
 
         console.log('Redirigiendo a dashboard...');
+        setIsLoading(false);
         router.replace('/dashboard');
       } else {
         setErrorMessage('No se pudo iniciar sesión. Intenta de nuevo.');
