@@ -12,8 +12,6 @@ import { AlertTriangle } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -33,12 +31,17 @@ export default function LoginPage() {
     setErrorMessage(null);
     setIsLoading(true);
 
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const emailValue = String(formData.get('email') || '').trim();
+    const passwordValue = String(formData.get('password') || '');
+
+    console.log('Intentando login con:', { emailValue, hasPassword: Boolean(passwordValue) });
+
     try {
-      console.log('Intentando login con:', email);
-      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: emailValue,
+        password: passwordValue,
       });
 
       console.log('Respuesta login:', { data, error });
@@ -51,6 +54,7 @@ export default function LoginPage() {
       }
 
       if (data?.session) {
+        console.log('Session recibida en signInWithPassword:', data.session);
         const authUserId = data.session.user.id;
         console.log('Sesión exitosa, actualizando timestamp de login...');
         
@@ -62,8 +66,6 @@ export default function LoginPage() {
           // Don't fail the login, just log the error
         }
 
-        // Wait a bit to ensure session is fully established
-        await new Promise(resolve => setTimeout(resolve, 1000));
         console.log('Redirigiendo a dashboard...');
         router.replace('/dashboard');
       } else {
@@ -98,9 +100,8 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-300">Correo electrónico</label>
               <Input
+                name="email"
                 type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
                 placeholder="usuario@empresa.com"
                 required
               />
@@ -109,9 +110,8 @@ export default function LoginPage() {
             <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-300">Contraseña</label>
               <Input
+                name="password"
                 type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
                 placeholder="********"
                 required
               />

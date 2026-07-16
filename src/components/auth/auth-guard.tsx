@@ -12,30 +12,73 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let active = true;
 
-    const verifySession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+    const redirectToLogin = () => {
       if (!active) return;
-
-      if (pathname?.startsWith('/dashboard') && !session) {
+      if (pathname?.startsWith('/dashboard')) {
         router.replace('/auth/login');
+      }
+      setReady(true);
+    };
+
+    const verifySession = async () => {
+      if (!pathname?.startsWith('/dashboard')) {
         setReady(true);
         return;
       }
 
-      setReady(true);
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      console.log('AuthGuard verifySession pathname:', pathname, 'session:', session);
+
+      if (!active) return;
+
+      if (session) {
+        setReady(true);
+        return;
+      }
+
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (!active) return;
+
+      if (user && !error) {
+        setReady(true);
+        return;
+      }
+
+      router.replace('/auth/login');
+      return;
     };
 
     verifySession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('AuthGuard auth event:', event, 'session:', session);
       if (!active) return;
-      if (pathname?.startsWith('/dashboard') && !session) {
-        router.replace('/auth/login');
+
+      if (!pathname?.startsWith('/dashboard')) {
+        return;
+      }
+
+      if (event === 'SIGNED_IN' || session) {
+        setReady(true);
+        return;
+      }
+
+      if (event === 'SIGNED_OUT') {
+        redirectToLogin();
+        return;
+      }
+      
+      if (!session) {
+        redirectToLogin();
       }
     });
 
