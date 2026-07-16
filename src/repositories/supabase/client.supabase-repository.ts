@@ -192,7 +192,7 @@ export class ClientSupabaseRepository implements IClientRepository {
   }
 
   async findWithUpcomingBirthdays(companyId: string, daysAhead: number): Promise<Client[]> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .rpc('find_upcoming_birthdays', {
         p_company_id: companyId,
         p_days_ahead: daysAhead,
