@@ -67,34 +67,28 @@ export default function RegisterPage() {
       }
 
       // 2. Complete registration by creating company, user, roles, etc.
-      try {
-        await completeRegistration(authUserId, email, firstName, lastName);
-      } catch (registrationError) {
-        console.error('Registration completion error:', registrationError);
-        setErrorMessage(
-          `Cuenta creada pero hubo un error al completar el registro: ${registrationError instanceof Error ? registrationError.message : 'Error desconocido'}`
-        );
+      const registrationResult = await completeRegistration(authUserId, email, firstName, lastName);
+
+      if (!registrationResult.success) {
+        console.error('Registration completion error:', registrationResult.message);
+        setErrorMessage(`Cuenta creada pero hubo un error al completar el registro: ${registrationResult.message}`);
         setIsLoading(false);
         return;
       }
 
-      // 3. If user has session immediately (no email confirmation needed), redirect to dashboard
       if (signUpData?.session) {
         setFeedback('¡Cuenta creada exitosamente! Redirigiendo al dashboard...');
         setTimeout(() => {
-          router.replace('/dashboard');
+          window.location.href = '/dashboard';
         }, 1000);
         return;
       }
 
-      // 4. Otherwise, show message about email confirmation
-      setFeedback(
-        'Cuenta creada. Revisa tu correo y sigue el enlace de confirmación. Te llevaremos al login en unos segundos.'
-      );
+      setFeedback('Cuenta creada. Revisa tu correo y sigue el enlace de confirmación.');
       setIsLoading(false);
       setTimeout(() => {
-        router.replace('/auth/login');
-      }, 7000);
+        window.location.href = '/auth/login';
+      }, 5000);
     } catch (err) {
       console.error('Register error:', err);
       setErrorMessage(err instanceof Error ? err.message : 'Error desconocido');

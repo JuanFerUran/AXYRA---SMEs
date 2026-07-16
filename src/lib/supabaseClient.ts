@@ -8,4 +8,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
 }
 
-export const supabase = createClient(supabaseUrl ?? '', supabaseAnonKey ?? '');
+const storage = typeof window !== 'undefined' ? window.localStorage : undefined;
+
+const globalForSupabase = globalThis as typeof globalThis & {
+  __supabaseClient?: ReturnType<typeof createClient>;
+};
+
+export const supabase = globalForSupabase.__supabaseClient ?? createClient(supabaseUrl ?? '', supabaseAnonKey ?? '', {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storage,
+  },
+});
+
+globalForSupabase.__supabaseClient = supabase;

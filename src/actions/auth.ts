@@ -2,36 +2,114 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Use SERVICE_ROLE_KEY for server-side operations (has all permissions)
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+
+if (!supabaseUrl || !serviceRoleKey) {
+  console.error('Missing Supabase server env vars. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
+}
+
+const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
+  auth: { persistSession: false },
+});
+
+function normalizeError(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return 'Error desconocido';
+  }
+}
+
+function buildCompanyName(
+  firstName: string,
+  lastName: string,
+  email: string,
+  authUserId: string
+) {
+  const namePart = [firstName, lastName].filter(Boolean).join(' ').trim();
+  const emailPart = email.split('@')[0].replace(/[^a-zA-Z0-9]+/g, '-');
+  const uniqueSuffix = authUserId.slice(0, 8);
+
+  if (namePart) {
+    return `Empresa de ${namePart} ${uniqueSuffix}`;
+  }
+
+  return `Empresa de ${emailPart} ${uniqueSuffix}`;
+}
+
+function createRandomSuffix() {
+  return Math.random().toString(36).slice(2, 8);
+}
+
+function isCompanyDuplicateError(error: any) {
+  const message = error?.message?.toLowerCase() ?? '';
+  return (
+    message.includes('companies_name_key') ||
+    message.includes('companies_slug_key') ||
+    message.includes('unique constraint')
+  );
+}
+
+export type CompleteRegistrationResult =
+  | { success: true; companyId: string; userId: string }
+  | { success: false; message: string };
 
 export async function completeRegistration(
   authUserId: string,
   email: string,
   firstName: string,
   lastName: string
-) {
+): Promise<CompleteRegistrationResult> {
+  if (!supabaseUrl || !serviceRoleKey) {
+    const message = 'Missing Supabase server env vars. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.';
+    console.error(message);
+    return { success: false, message };
+  }
+
   try {
-    // 1. Create company
-    const { data: company, error: companyError } = await supabaseAdmin
-      .from('companies')
-      .insert([
-        {
-          name: `${firstName} ${lastName}`,
-          description: `Empresa personal de ${firstName}`,
-          subscription_tier: 'free',
-          is_active: true,
-        },
-      ])
-      .select()
-      .single();
+    // 1. Create company with a friendly name and an auth ID suffix.
+    const companyBaseName = buildCompanyName(firstName, lastName, email, authUserId);
+    const companyName = companyBaseName;
+
+    const insertCompany = async (name: string) =>
+      supabaseAdmin
+        .from('companies')
+        .insert([
+          {
+            name,
+            description: `Empresa personal de ${companyBaseName}`,
+            subscription_tier: 'free',
+            is_active: true,
+          },
+        ])
+        .select()
+        .single();
+
+    let { data: company, error: companyError } = await insertCompany(companyName);
+
+    if ((companyError || !company) && isCompanyDuplicateError(companyError)) {
+      const fallbackName = `${companyName}-${createRandomSuffix()}`;
+      const fallbackResult = await insertCompany(fallbackName);
+      company = fallbackResult.data;
+      companyError = fallbackResult.error;
+
+      if ((companyError || !company) && isCompanyDuplicateError(companyError)) {
+        const randomFallbackName = `${companyName}-${createRandomSuffix()}`;
+        const randomFallbackResult = await insertCompany(randomFallbackName);
+        company = randomFallbackResult.data;
+        companyError = randomFallbackResult.error;
+      }
+    }
 
     if (companyError || !company) {
       console.error('Company creation error:', companyError);
-      throw new Error('No se pudo crear la empresa');
+      return {
+        success: false,
+        message: `No se pudo crear la empresa: ${companyError?.message ?? 'error desconocido'}`,
+      };
     }
 
     // 2. Create user in users table
@@ -52,7 +130,10 @@ export async function completeRegistration(
 
     if (userError || !user) {
       console.error('User creation error:', userError);
-      throw new Error('No se pudo crear el usuario');
+      return {
+        success: false,
+        message: `No se pudo crear el usuario: ${userError?.message ?? 'error desconocido'}`,
+      };
     }
 
     // 3. Create or get admin role
@@ -94,7 +175,10 @@ export async function completeRegistration(
 
     if (roleError || !adminRole) {
       console.error('Role creation error:', roleError);
-      throw new Error('No se pudo crear el rol');
+      return {
+        success: false,
+        message: `No se pudo crear el rol: ${roleError?.message ?? 'error desconocido'}`,
+      };
     }
 
     // 4. Assign admin role to user
@@ -110,7 +194,10 @@ export async function completeRegistration(
 
     if (assignError) {
       console.error('Role assignment error:', assignError);
-      throw new Error('No se pudo asignar el rol');
+      return {
+        success: false,
+        message: `No se pudo asignar el rol: ${assignError?.message ?? 'error desconocido'}`,
+      };
     }
 
     // 5. Create default client statuses
@@ -145,7 +232,6 @@ export async function completeRegistration(
 
     if (statusError) {
       console.error('Status creation error:', statusError);
-      // Don't throw - statuses might already exist
     }
 
     return {
@@ -155,7 +241,8 @@ export async function completeRegistration(
     };
   } catch (error) {
     console.error('Registration completion error:', error);
-    throw error;
+    const message = normalizeError(error);
+    return { success: false, message: `Error en completeRegistration: ${message}` };
   }
 }
 
