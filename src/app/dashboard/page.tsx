@@ -17,6 +17,7 @@ import { StatCard, GradientCard } from '@/components/animations/animated-cards';
 import { MotionContainer, MotionItem } from '@/components/animations/motion';
 import { DataTable } from '@/components/animations/data-table';
 import { FirstSetupModal } from '@/components/onboarding/first-setup-modal';
+import { AutomationCenterPanel } from '@/components/dashboard/automation-center-panel';
 import { QuickActionsPanel } from '@/components/dashboard/quick-actions-panel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClients } from '@/features/clients/hooks/useClients';
@@ -192,6 +193,10 @@ export default function DashboardPage() {
 
       <MotionItem className="mb-8">
         <QuickActionsPanel />
+      </MotionItem>
+
+      <MotionItem className="mb-8">
+        <AutomationCenterPanel clients={clients} />
       </MotionItem>
 
       {/* KPI Cards */}
