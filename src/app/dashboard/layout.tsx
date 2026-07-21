@@ -38,10 +38,10 @@ export default function DashboardLayout({
   const isActive = (href: string) => pathname === href;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-950 text-white">
       {/* Sidebar */}
       <motion.div
-        className="fixed left-0 top-0 z-40 h-full w-64 border-r border-border bg-card"
+        className="fixed left-0 top-0 z-40 h-full w-64 border-r border-white/10 bg-slate-900"
         initial={{ x: -256 }}
         animate={{ x: 0 }}
         transition={{ duration: 0.3 }}
@@ -53,10 +53,10 @@ export default function DashboardLayout({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-purple-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-fuchsia-500">
               <span className="text-lg font-bold text-white">BIA</span>
             </div>
-            <span className="text-lg font-bold">BIA Platform</span>
+            <span className="text-lg font-bold text-white">BIA Platform</span>
           </motion.div>
         </div>
 
@@ -76,8 +76,8 @@ export default function DashboardLayout({
                   href={item.href}
                   className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                     active
-                      ? 'bg-primary text-white'
-                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                      ? 'bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white shadow-lg shadow-cyan-500/25'
+                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -88,9 +88,9 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 p-4">
           <motion.button
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-slate-800 hover:text-white"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={async () => {
@@ -108,29 +108,29 @@ export default function DashboardLayout({
       <div className="ml-64">
         {/* Header */}
         <motion.div
-          className="border-b border-border bg-card p-6 md:p-8"
+          className="border-b border-white/10 bg-slate-900/50 p-6 backdrop-blur-sm md:p-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
           <div className="flex items-center justify-between">
             <div className="hidden md:block">
-              <h1 className="text-sm text-muted-foreground">Welcome back!</h1>
+              <h1 className="text-sm text-slate-400">Bienvenido a BIA</h1>
             </div>
 
             <div className="flex items-center gap-4">
               <motion.button
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 transition-colors hover:bg-slate-800"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Bell className="h-5 w-5 text-muted-foreground" />
+                <Bell className="h-5 w-5 text-slate-400" />
               </motion.button>
 
-              <div className="h-10 w-10 rounded-full bg-linear-to-br from-blue-500 to-purple-600" />
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-fuchsia-500" />
 
               <motion.button
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border transition-colors hover:bg-muted md:hidden"
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 transition-colors hover:bg-slate-800 md:hidden"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSidebarOpen(!sidebarOpen)}

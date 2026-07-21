@@ -53,7 +53,7 @@ export default function CallbackContent() {
         setMessage('No se pudo establecer la sesión. Te redirigiremos al login.');
         setTimeout(() => router.push('/auth/login'), 3000);
       } catch (err) {
-        console.error('Callback error:', err);
+        // Error en callback
         setMessage('Error durante la autenticación. Te redirigiremos al login.');
         setTimeout(() => router.push('/auth/login'), 3000);
       }

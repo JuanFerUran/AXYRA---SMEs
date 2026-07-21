@@ -78,7 +78,7 @@ export function AnimatedForm({
         setFormData(fields.reduce((acc, field) => ({ ...acc, [field.name]: '' }), {}));
       }, 2000);
     } catch (error) {
-      console.error('Form submission error:', error);
+      // Error en formulario
     } finally {
       setIsSubmitting(false);
     }

@@ -155,7 +155,7 @@ export default function ClientsPage() {
       try {
         await deleteClient(clientId);
       } catch (error) {
-        console.error('Error al eliminar cliente:', error);
+        // Error al eliminar
       }
     },
     [deleteClient]

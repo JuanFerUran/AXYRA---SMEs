@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { AlertTriangle } from 'lucide-react';
+import { SpecializationModal } from '@/components/modals/specialization-modal';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -21,6 +22,8 @@ export default function RegisterPage() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [redirectingToLogin, setRedirectingToLogin] = useState(false);
+  const [showSpecializationModal, setShowSpecializationModal] = useState(false);
+  const [isSavingSpecialization, setIsSavingSpecialization] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -70,29 +73,45 @@ export default function RegisterPage() {
       const registrationResult = await completeRegistration(authUserId, email, firstName, lastName);
 
       if (!registrationResult.success) {
-        console.error('Registration completion error:', registrationResult.message);
         setErrorMessage(`Cuenta creada pero hubo un error al completar el registro: ${registrationResult.message}`);
         setIsLoading(false);
         return;
       }
 
-      if (signUpData?.session) {
-        setFeedback('¡Cuenta creada exitosamente! Redirigiendo al dashboard...');
-        setTimeout(() => {
-          window.location.href = '/dashboard';
-        }, 1000);
-        return;
-      }
-
-      setFeedback('Cuenta creada. Revisa tu correo y sigue el enlace de confirmación.');
+      // 3. Show specialization modal
+      setShowSpecializationModal(true);
       setIsLoading(false);
-      setTimeout(() => {
-        window.location.href = '/auth/login';
-      }, 5000);
+      setFeedback('¡Cuenta creada! Ahora cuéntanos más sobre tu negocio...');
     } catch (err) {
-      console.error('Register error:', err);
       setErrorMessage(err instanceof Error ? err.message : 'Error desconocido');
       setIsLoading(false);
+    }
+  };
+
+  const handleSpecializationSelect = async (specialization: string) => {
+    setIsSavingSpecialization(true);
+
+    try {
+      // Guardar especialización en user_metadata
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          specialization,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setShowSpecializationModal(false);
+      setFeedback('¡Listo! Redirigiendo al dashboard...');
+
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Error guardando especialización');
+      setIsSavingSpecialization(false);
     }
   };
 
@@ -195,6 +214,13 @@ export default function RegisterPage() {
           </div>
         </CardContent>
       </Card>
+
+      <SpecializationModal
+        isOpen={showSpecializationModal}
+        onClose={() => setShowSpecializationModal(false)}
+        onSelect={handleSpecializationSelect}
+        isLoading={isSavingSpecialization}
+      />
     </main>
   );
 }

@@ -44,41 +44,31 @@ export default function LoginPage() {
     const emailValue = String(formData.get('email') || '').trim();
     const passwordValue = String(formData.get('password') || '');
 
-    console.log('Intentando login con:', { emailValue, hasPassword: Boolean(passwordValue) });
-
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: emailValue,
         password: passwordValue,
       });
 
-      console.log('Respuesta login:', { data, error });
-
       if (error) {
-        console.error('Error de login:', error);
         setErrorMessage(error.message || 'Error al iniciar sesión');
         setIsLoading(false);
         return;
       }
 
       if (data?.session) {
-        console.log('Session recibida en signInWithPassword:', data.session);
         const authUserId = data.session.user.id;
-        console.log('Sesión exitosa, actualizando timestamp de login...');
 
-        void updateLoginTimestamp(authUserId).catch((timestampError) => {
-          console.error('Error actualizando timestamp:', timestampError);
+        void updateLoginTimestamp(authUserId).catch(() => {
+          // Error silencioso
         });
 
         const { data: refreshedSessionData } = await supabase.auth.getSession();
         if (refreshedSessionData.session) {
-          console.log('Redirigiendo a dashboard...');
           setIsLoading(false);
           router.replace('/dashboard');
           return;
         }
-
-        console.log('No se detectó sesión refrescada, forzando navegación...');
         setIsLoading(false);
         window.location.assign('/dashboard');
       } else {
