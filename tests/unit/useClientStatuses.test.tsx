@@ -27,5 +27,5 @@ function TestComponent() {
 
 test('loads and displays statuses', async () => {
   render(<TestComponent />);
-  await waitFor(() => expect(screen.getByText('Activo')).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByText('Activo')).toBeTruthy());
 });

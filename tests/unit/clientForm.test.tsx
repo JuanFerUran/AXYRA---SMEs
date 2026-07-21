@@ -15,8 +15,8 @@ import { ClientForm } from '@/app/dashboard/clients/client-form';
 test('renders form and submits', async () => {
   render(<ClientForm companyId="c1" />);
   // check that select option is rendered
-  expect(screen.getByText('Selecciona un estado')).toBeInTheDocument();
-  expect(screen.getByText('Activo')).toBeInTheDocument();
+  expect(screen.getByText('Selecciona un estado')).toBeTruthy();
+  expect(screen.getByText('Activo')).toBeTruthy();
 
   // fill required name and select status
   const textboxes = screen.getAllByRole('textbox');

@@ -1,1 +1,2 @@
-import '@testing-library/jest-dom/extend-expect';
+// setup file for tests (kept minimal to avoid extra dependencies)
+
