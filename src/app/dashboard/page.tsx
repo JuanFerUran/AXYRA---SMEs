@@ -18,6 +18,7 @@ import { MotionContainer, MotionItem } from '@/components/animations/motion';
 import { DataTable } from '@/components/animations/data-table';
 import { FirstSetupModal } from '@/components/onboarding/first-setup-modal';
 import { AutomationCenterPanel } from '@/components/dashboard/automation-center-panel';
+import { AIAssistantPanel } from '@/components/dashboard/ai-assistant-panel';
 import { QuickActionsPanel } from '@/components/dashboard/quick-actions-panel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClients } from '@/features/clients/hooks/useClients';
@@ -255,6 +256,10 @@ export default function DashboardPage() {
             })}
           </div>
         </div>
+      </MotionItem>
+
+      <MotionItem className="mb-8">
+        <AIAssistantPanel clients={clients} />
       </MotionItem>
 
       <MotionItem className="mb-8">
