@@ -62,7 +62,9 @@ export default function LoginPage() {
           console.error('Error actualizando timestamp:', timestampError);
         });
 
+        // Give the session a moment to persist to localStorage
         console.log('Redirigiendo a dashboard...');
+        await new Promise(resolve => setTimeout(resolve, 200));
         setIsLoading(false);
         router.replace('/dashboard');
       } else {

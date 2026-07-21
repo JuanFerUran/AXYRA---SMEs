@@ -11,6 +11,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    let sessionCheckTimeout: NodeJS.Timeout;
 
     const redirectToLogin = () => {
       if (!active) return;
@@ -25,6 +26,9 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         setReady(true);
         return;
       }
+
+      // Small delay to ensure session is properly loaded
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const {
         data: { session },
@@ -51,7 +55,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      router.replace('/auth/login');
+      redirectToLogin();
       return;
     };
 
@@ -64,6 +68,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       if (!active) return;
 
       if (!pathname?.startsWith('/dashboard')) {
+        setReady(true);
         return;
       }
 
@@ -84,6 +89,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
     return () => {
       active = false;
+      clearTimeout(sessionCheckTimeout);
       subscription.unsubscribe();
     };
   }, [pathname, router]);
