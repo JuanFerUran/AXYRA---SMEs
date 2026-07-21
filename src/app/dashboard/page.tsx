@@ -27,7 +27,7 @@ const AnimatedChart = dynamic(
     loading: () => (
       <div className="rounded-lg border border-border bg-card p-6">
         <Skeleton className="mb-4 h-6 w-32" />
-        <Skeleton className="h-[300px] w-full" />
+        <Skeleton className="h-75 w-full" />
       </div>
     ),
   }
@@ -61,8 +61,19 @@ export default function DashboardPage() {
   const { session, companyId, isLoading: authLoading } = useSupabaseAuth();
   const { clients, isLoading } = useClients({
     filters: companyId ? { company_id: companyId } : undefined,
-    autoFetch: Boolean(companyId),
+    autoFetch: Boolean(session),
   });
+
+  const specialization = useMemo(() => {
+    const metadataSpecialization =
+      session?.user.user_metadata?.specialization ||
+      session?.user.app_metadata?.specialization ||
+      session?.user.user_metadata?.role ||
+      session?.user.app_metadata?.role ||
+      'Sin asignar';
+
+    return typeof metadataSpecialization === 'string' ? metadataSpecialization : 'Sin asignar';
+  }, [session]);
 
   const salesData = useMemo(
     () => [
@@ -148,6 +159,7 @@ export default function DashboardPage() {
             {companyId && (
               <p className="mt-2 text-white/80">Company ID: {companyId}</p>
             )}
+            <p className="mt-2 text-white/80">Especialización: {specialization}</p>
           </div>
           <motion.div
             className="absolute right -10 top -10 h-40 w-40 rounded-full bg-white/10"
@@ -155,6 +167,15 @@ export default function DashboardPage() {
             transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
           />
         </GradientCard>
+      </MotionItem>
+
+      <MotionItem className="mb-8">
+        <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 p-4 text-sm text-cyan-100">
+          <p className="font-semibold">Vista base compartida</p>
+          <p className="mt-1 text-cyan-50/80">
+            Todos los usuarios ingresan al mismo dashboard central. La especialización por rol, módulo o plan se asignará dentro de esta estructura para mantener una experiencia unificada.
+          </p>
+        </div>
       </MotionItem>
 
       {/* KPI Cards */}

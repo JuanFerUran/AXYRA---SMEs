@@ -16,14 +16,22 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
+      if (!isMounted) return;
+
       if (data.session) {
         router.replace('/dashboard');
       }
     };
 
-    checkSession();
+    void checkSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -62,12 +70,16 @@ export default function LoginPage() {
           console.error('Error actualizando timestamp:', timestampError);
         });
 
-        // Give the session a moment to persist to localStorage
-        console.log('Redirigiendo a dashboard...');
-        await new Promise(resolve => setTimeout(resolve, 300));
-        setIsLoading(false);
+        const { data: refreshedSessionData } = await supabase.auth.getSession();
+        if (refreshedSessionData.session) {
+          console.log('Redirigiendo a dashboard...');
+          setIsLoading(false);
+          router.replace('/dashboard');
+          return;
+        }
 
-        // Force a hard navigation to bypass any pending layout/auth state issues
+        console.log('No se detectó sesión refrescada, forzando navegación...');
+        setIsLoading(false);
         window.location.assign('/dashboard');
       } else {
         setErrorMessage('No se pudo iniciar sesión. Intenta de nuevo.');

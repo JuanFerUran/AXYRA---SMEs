@@ -1,70 +1,77 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let active = true;
-    let hasSession = false;
+    const isProtectedRoute = pathname?.startsWith('/dashboard') ?? false;
+    const isAuthRoute = pathname === '/auth/login' || pathname === '/auth/register' || pathname === '/auth/callback';
+
+    const finalize = (session: typeof supabase.auth.getSession extends () => Promise<infer T> ? T extends { data: { session: infer S } } ? S : never : never) => {
+      if (!active) return;
+
+      if (session) {
+        setReady(true);
+        return;
+      }
+
+      if (isProtectedRoute) {
+        router.replace('/auth/login');
+        return;
+      }
+
+      setReady(true);
+    };
 
     const checkInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        hasSession = true;
-        if (active) setReady(true);
-      }
+      if (!active) return;
+      finalize(session);
     };
 
-    // Check if we already have a session stored
-    checkInitialSession();
+    void checkInitialSession();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('AuthGuard onAuthStateChange:', event);
-        
-        if (!active) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!active) return;
 
-        if (session) {
-          hasSession = true;
-          setReady(true);
-          return;
-        }
-
-        // Only redirect if we're going to a protected page and lost session
-        if (event === 'SIGNED_OUT') {
-          const currentPath = window.location.pathname;
-          if (currentPath.startsWith('/dashboard')) {
-            router.replace('/auth/login');
-          }
-        }
+      if (event === 'SIGNED_OUT' && isProtectedRoute) {
+        router.replace('/auth/login');
+        return;
       }
-    );
 
-    // Set ready for non-dashboard pages after a short delay to let auth initialize
-    const timeout = setTimeout(() => {
-      if (active && !hasSession) {
-        const currentPath = window.location.pathname;
-        if (!currentPath.startsWith('/dashboard')) {
-          setReady(true);
-        }
+      if (session) {
+        setReady(true);
+        return;
       }
-    }, 500);
+
+      if (!isAuthRoute) {
+        setReady(true);
+      }
+    });
+
+    const timeout = window.setTimeout(() => {
+      if (!active) return;
+      if (!isProtectedRoute && !isAuthRoute) {
+        setReady(true);
+      }
+    }, 300);
 
     return () => {
       active = false;
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, []); // Empty dependency array - run once on mount
+  }, [pathname, router]);
 
   if (!ready) {
-    return null; // Return nothing while checking auth, don't show loading state
+    return null;
   }
 
   return <>{children}</>;
