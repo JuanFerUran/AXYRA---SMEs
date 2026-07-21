@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Users,
   TrendingUp,
@@ -16,6 +16,8 @@ import {
 import { StatCard, GradientCard } from '@/components/animations/animated-cards';
 import { MotionContainer, MotionItem } from '@/components/animations/motion';
 import { DataTable } from '@/components/animations/data-table';
+import { FirstSetupModal } from '@/components/onboarding/first-setup-modal';
+import { QuickActionsPanel } from '@/components/dashboard/quick-actions-panel';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClients } from '@/features/clients/hooks/useClients';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
@@ -59,6 +61,7 @@ const containerVariants = {
 
 export default function DashboardPage() {
   const { session, companyId, isLoading: authLoading } = useSupabaseAuth();
+  const [showSetupModal, setShowSetupModal] = useState(false);
   const { clients, isLoading } = useClients({
     filters: companyId ? { company_id: companyId } : undefined,
     autoFetch: Boolean(session),
@@ -74,6 +77,15 @@ export default function DashboardPage() {
 
     return typeof metadataSpecialization === 'string' ? metadataSpecialization : 'Sin asignar';
   }, [session]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const completed = window.localStorage.getItem('axyra-first-setup-completed');
+    if (!completed) {
+      const timeout = window.setTimeout(() => setShowSetupModal(true), 800);
+      return () => window.clearTimeout(timeout);
+    }
+  }, []);
 
   const salesData = useMemo(
     () => [
@@ -176,6 +188,10 @@ export default function DashboardPage() {
             Todos los usuarios ingresan al mismo dashboard central. La especialización por rol, módulo o plan se asignará dentro de esta estructura para mantener una experiencia unificada.
           </p>
         </div>
+      </MotionItem>
+
+      <MotionItem className="mb-8">
+        <QuickActionsPanel />
       </MotionItem>
 
       {/* KPI Cards */}
@@ -282,36 +298,21 @@ export default function DashboardPage() {
         </MotionItem>
       )}
 
-      {/* Quick Actions */}
-      <MotionItem className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <motion.button
-          className="rounded-lg bg-linear-to-r from-purple-500 to-pink-500 p-6 text-left text-white transition-all hover:shadow-lg"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+      <MotionItem className="mt-8">
+        <div className="rounded-2xl border border-white/10 bg-slate-900/70 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm opacity-90">Create New</p>
-              <p className="mt-1 text-xl font-semibold">Automation</p>
+              <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Progreso</p>
+              <h3 className="mt-2 text-xl font-semibold text-white">Tu negocio está avanzando</h3>
             </div>
-            <Zap className="h-6 w-6 opacity-50" />
-          </div>
-        </motion.button>
-
-        <motion.button
-          className="rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 p-6 text-left text-white transition-all hover:shadow-lg"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm opacity-90">View</p>
-              <p className="mt-1 text-xl font-semibold">Analytics</p>
+            <div className="rounded-full bg-cyan-500/10 px-3 py-1 text-sm text-cyan-200">
+              {clients.length > 0 ? 'Activa' : 'Configurando'}
             </div>
-            <BarChart3 className="h-6 w-6 opacity-50" />
           </div>
-        </motion.button>
+        </div>
       </MotionItem>
+
+      <FirstSetupModal isOpen={showSetupModal} onClose={() => setShowSetupModal(false)} />
     </motion.div>
   );
 }

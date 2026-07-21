@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useCallback } from 'react';
-import { Plus, Search, Download, TrendingUp } from 'lucide-react';
+import { Plus, Search, Download, TrendingUp, Sparkles, Inbox, Filter } from 'lucide-react';
 import { useClients } from '@/features/clients/hooks/useClients';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { ClientList } from '@/features/clients/ui/client-card';
@@ -195,6 +195,8 @@ export default function ClientsPage() {
     );
   }
 
+  const hasClients = clients.length > 0;
+
   return (
     <MotionContainer className="min-h-screen bg-background p-6 md:p-8" variants={containerVariants}>
       <MotionItem variants={itemVariants} className="mb-8 rounded-[2rem] border border-border bg-card p-8 shadow-xl">
@@ -216,6 +218,25 @@ export default function ClientsPage() {
           </div>
         </div>
       </MotionItem>
+
+      {!hasClients && (
+          <MotionItem variants={itemVariants} className="mb-8 rounded-[2rem] border border-cyan-500/20 bg-linear-to-br from-cyan-500/10 to-fuchsia-500/10 p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-sm text-cyan-200">
+                <Sparkles className="h-4 w-4" /> Primeros pasos premium
+              </div>
+              <h2 className="text-2xl font-semibold text-white">Tu base de clientes está lista para crecer</h2>
+              <p className="mt-2 text-sm text-slate-300">
+                Añade tu primer cliente y empieza a organizar oportunidades, recordatorios y seguimiento de forma mucho más inteligente.
+              </p>
+            </div>
+            <Button onClick={openNewClientModal}>
+              <Plus className="mr-2 h-4 w-4" /> Crear primer cliente
+            </Button>
+          </div>
+        </MotionItem>
+      )}
 
       <MotionItem variants={itemVariants} className="grid gap-6 xl:grid-cols-[1.4fr_0.6fr]">
         <div className="grid gap-6">
