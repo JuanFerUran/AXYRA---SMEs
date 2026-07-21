@@ -64,9 +64,11 @@ export default function LoginPage() {
 
         // Give the session a moment to persist to localStorage
         console.log('Redirigiendo a dashboard...');
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
         setIsLoading(false);
-        router.replace('/dashboard');
+
+        // Force a hard navigation to bypass any pending layout/auth state issues
+        window.location.assign('/dashboard');
       } else {
         setErrorMessage('No se pudo iniciar sesión. Intenta de nuevo.');
         setIsLoading(false);
