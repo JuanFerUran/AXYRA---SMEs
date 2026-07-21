@@ -8,96 +8,85 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
+  const [isAuthRoute, setIsAuthRoute] = useState(false);
 
   useEffect(() => {
     let active = true;
-    let sessionCheckTimeout: NodeJS.Timeout;
 
-    const redirectToLogin = () => {
-      if (!active) return;
-      if (pathname?.startsWith('/dashboard')) {
-        router.replace('/auth/login');
-      }
+    // Check if this is an auth route (login/register)
+    const authPaths = ['/auth/login', '/auth/register', '/auth/callback'];
+    const isAuthPath = authPaths.some(path => pathname?.startsWith(path));
+    
+    if (isAuthPath) {
+      setIsAuthRoute(true);
       setReady(true);
-    };
-
-    const verifySession = async () => {
-      if (!pathname?.startsWith('/dashboard')) {
-        setReady(true);
-        return;
-      }
-
-      // Small delay to ensure session is properly loaded
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      console.log('AuthGuard verifySession pathname:', pathname, 'session:', session);
-
-      if (!active) return;
-
-      if (session) {
-        setReady(true);
-        return;
-      }
-
-      const {
-        data: { user },
-        error,
-      } = await supabase.auth.getUser();
-
-      if (!active) return;
-
-      if (user && !error) {
-        setReady(true);
-        return;
-      }
-
-      redirectToLogin();
       return;
-    };
+    }
 
-    verifySession();
+    setIsAuthRoute(false);
+
+    // For non-auth routes (dashboard, etc), wait for auth state
+    let hasInitialized = false;
+    let redirectTimeout: NodeJS.Timeout;
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('AuthGuard auth event:', event, 'session:', session);
+      console.log('AuthGuard onAuthStateChange:', event, 'has session:', !!session);
+      
       if (!active) return;
 
-      if (!pathname?.startsWith('/dashboard')) {
+      // If we have a session, mark as ready
+      if (session) {
+        hasInitialized = true;
         setReady(true);
         return;
       }
 
-      if (event === 'SIGNED_IN' || session) {
-        setReady(true);
-        return;
-      }
-
-      if (event === 'SIGNED_OUT') {
-        redirectToLogin();
-        return;
-      }
-      
-      if (!session) {
-        redirectToLogin();
+      // If we're signed out or don't have a session on dashboard routes
+      if (!session && pathname?.startsWith('/dashboard')) {
+        if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') {
+          hasInitialized = true;
+          router.replace('/auth/login');
+          return;
+        }
       }
     });
 
+    // Fallback: if no auth state change after 3 seconds, check session directly
+    redirectTimeout = setTimeout(async () => {
+      if (!active || hasInitialized) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!active) return;
+
+      if (session) {
+        setReady(true);
+      } else if (pathname?.startsWith('/dashboard')) {
+        router.replace('/auth/login');
+      } else {
+        setReady(true);
+      }
+    }, 3000);
+
     return () => {
       active = false;
-      clearTimeout(sessionCheckTimeout);
+      clearTimeout(redirectTimeout);
       subscription.unsubscribe();
     };
   }, [pathname, router]);
 
-  if (pathname?.startsWith('/dashboard') && !ready) {
+  // For auth routes, render immediately
+  if (isAuthRoute) {
+    return <>{children}</>;
+  }
+
+  // For other routes, wait for auth verification
+  if (!ready) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-sm text-muted-foreground">Verificando sesión...</p>
+        <p className="text-sm text-muted-foreground">Verificando acceso...</p>
       </div>
     );
   }
