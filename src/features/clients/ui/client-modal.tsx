@@ -111,7 +111,7 @@ export function ClientModal({
       setFormState(
         initialClient
           ? mapClientToFormState(initialClient)
-          : { ...defaultFormState, company_id: companyId }
+          : { ...defaultFormState, company_id: companyId },
       );
       setError(null);
       setFeedback(null);
@@ -168,23 +168,37 @@ export function ClientModal({
         <DialogHeader>
           <DialogTitle>{isEditMode ? 'Editar cliente' : 'Nuevo cliente'}</DialogTitle>
           <DialogDescription>
-            {isEditMode ? 'Ajusta los datos del cliente y guarda los cambios.' : 'Ingresa información clave para crear un cliente nuevo.'}
+            {isEditMode
+              ? 'Ajusta los datos del cliente y guarda los cambios.'
+              : 'Ingresa información clave para crear un cliente nuevo.'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Nombre</label>
+              <label
+                htmlFor="modal_first_name"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Nombre
+              </label>
               <Input
+                id="modal_first_name"
                 value={formState.first_name}
                 onChange={(event) => setFormState({ ...formState, first_name: event.target.value })}
                 required
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Apellido</label>
+              <label
+                htmlFor="modal_last_name"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Apellido
+              </label>
               <Input
+                id="modal_last_name"
                 value={formState.last_name}
                 onChange={(event) => setFormState({ ...formState, last_name: event.target.value })}
                 required
@@ -194,55 +208,97 @@ export function ClientModal({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Correo electrónico</label>
+              <label
+                htmlFor="modal_email"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Correo electrónico
+              </label>
               <Input
+                id="modal_email"
                 type="email"
                 value={formState.email ?? ''}
-                onChange={(event) => setFormState({ ...formState, email: event.target.value || undefined })}
+                onChange={(event) =>
+                  setFormState({ ...formState, email: event.target.value || undefined })
+                }
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Teléfono</label>
+              <label
+                htmlFor="modal_phone"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Teléfono
+              </label>
               <Input
+                id="modal_phone"
                 type="tel"
                 value={formState.phone ?? ''}
-                onChange={(event) => setFormState({ ...formState, phone: event.target.value || undefined })}
+                onChange={(event) =>
+                  setFormState({ ...formState, phone: event.target.value || undefined })
+                }
               />
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
+              <label
+                htmlFor="modal_client_status_id"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Estado
+              </label>
               <Select
+                id="modal_client_status_id"
                 value={formState.client_status_id}
-                onChange={(event) => setFormState({ ...formState, client_status_id: event.target.value })}
+                onChange={(event) =>
+                  setFormState({ ...formState, client_status_id: event.target.value })
+                }
                 required
                 disabled={statusesLoading}
               >
                 <option value="">Selecciona un estado</option>
                 {statuses.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
                 ))}
               </Select>
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Valor de vida</label>
+              <label
+                htmlFor="modal_lifetime_value"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Valor de vida
+              </label>
               <Input
+                id="modal_lifetime_value"
                 type="number"
                 value={formState.lifetime_value}
-                onChange={(event) => setFormState({ ...formState, lifetime_value: Number(event.target.value) })}
+                onChange={(event) =>
+                  setFormState({ ...formState, lifetime_value: Number(event.target.value) })
+                }
               />
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Compras totales</label>
+              <label
+                htmlFor="modal_total_purchases"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Compras totales
+              </label>
               <Input
+                id="modal_total_purchases"
                 type="number"
                 value={formState.total_purchases}
-                onChange={(event) => setFormState({ ...formState, total_purchases: Number(event.target.value) })}
+                onChange={(event) =>
+                  setFormState({ ...formState, total_purchases: Number(event.target.value) })
+                }
               />
             </div>
             <div className="flex items-center gap-3">
@@ -250,7 +306,9 @@ export function ClientModal({
                 id="is_active"
                 type="checkbox"
                 checked={formState.is_active}
-                onChange={(event) => setFormState({ ...formState, is_active: event.target.checked })}
+                onChange={(event) =>
+                  setFormState({ ...formState, is_active: event.target.checked })
+                }
                 className="h-4 w-4 rounded border-input text-primary focus:ring-primary"
               />
               <label htmlFor="is_active" className="text-sm font-medium text-slate-700">
@@ -259,8 +317,16 @@ export function ClientModal({
             </div>
           </div>
 
-          {error && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-          {feedback && <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">{feedback}</p>}
+          {error && (
+            <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+          {feedback && (
+            <p className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+              {feedback}
+            </p>
+          )}
 
           <DialogFooter>
             <button

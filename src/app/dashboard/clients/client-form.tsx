@@ -62,16 +62,22 @@ export function ClientForm({ companyId }: { companyId: string }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Nombre</label>
+              <label htmlFor="first_name" className="mb-2 block text-sm font-medium text-slate-700">
+                Nombre
+              </label>
               <Input
+                id="first_name"
                 value={client.first_name}
                 onChange={(event) => setClient({ ...client, first_name: event.target.value })}
                 required
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Apellido</label>
+              <label htmlFor="last_name" className="mb-2 block text-sm font-medium text-slate-700">
+                Apellido
+              </label>
               <Input
+                id="last_name"
                 value={client.last_name}
                 onChange={(event) => setClient({ ...client, last_name: event.target.value })}
               />
@@ -80,16 +86,22 @@ export function ClientForm({ companyId }: { companyId: string }) {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Correo</label>
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">
+                Correo
+              </label>
               <Input
+                id="email"
                 type="email"
                 value={client.email ?? ''}
                 onChange={(event) => setClient({ ...client, email: event.target.value })}
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Teléfono</label>
+              <label htmlFor="phone" className="mb-2 block text-sm font-medium text-slate-700">
+                Teléfono
+              </label>
               <Input
+                id="phone"
                 type="tel"
                 value={client.phone ?? ''}
                 onChange={(event) => setClient({ ...client, phone: event.target.value })}
@@ -99,8 +111,14 @@ export function ClientForm({ companyId }: { companyId: string }) {
 
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
+              <label
+                htmlFor="client_status_id"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Estado
+              </label>
               <Select
+                id="client_status_id"
                 value={client.client_status_id}
                 onChange={(event) => setClient({ ...client, client_status_id: event.target.value })}
                 required
@@ -108,16 +126,26 @@ export function ClientForm({ companyId }: { companyId: string }) {
               >
                 <option value="">Selecciona un estado</option>
                 {statuses.map((s) => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
                 ))}
               </Select>
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-700">Valor de vida</label>
+              <label
+                htmlFor="lifetime_value"
+                className="mb-2 block text-sm font-medium text-slate-700"
+              >
+                Valor de vida
+              </label>
               <Input
+                id="lifetime_value"
                 type="number"
                 value={client.lifetime_value}
-                onChange={(event) => setClient({ ...client, lifetime_value: Number(event.target.value) })}
+                onChange={(event) =>
+                  setClient({ ...client, lifetime_value: Number(event.target.value) })
+                }
               />
             </div>
           </div>

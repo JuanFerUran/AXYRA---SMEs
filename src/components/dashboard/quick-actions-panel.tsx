@@ -23,7 +23,7 @@ const actions = [
     accent: 'from-emerald-500 to-teal-500',
   },
   {
-    title: 'Start premium',
+    title: 'Comenzar Premium',
     description: 'Configura tu experiencia inicial en 2 minutos.',
     icon: Sparkles,
     accent: 'from-violet-500 to-fuchsia-500',
@@ -43,7 +43,9 @@ export function QuickActionsPanel() {
             transition={{ delay: 0.05 * index }}
             className="rounded-2xl border border-white/10 bg-slate-900/70 p-5 shadow-lg"
           >
-            <div className={`mb-4 inline-flex rounded-2xl bg-linear-to-br ${action.accent} p-3 text-white`}>
+            <div
+              className={`mb-4 inline-flex rounded-2xl bg-linear-to-br ${action.accent} p-3 text-white`}
+            >
               <Icon className="h-5 w-5" />
             </div>
             <p className="font-semibold text-white">{action.title}</p>

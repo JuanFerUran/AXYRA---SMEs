@@ -34,7 +34,7 @@ const AnimatedChart = dynamic(
         <Skeleton className="h-75 w-full" />
       </div>
     ),
-  }
+  },
 );
 
 const ClientForm = dynamic(() => import('./clients/client-form').then((mod) => mod.ClientForm), {
@@ -98,7 +98,7 @@ export default function DashboardPage() {
       { name: 'Fri', value: 4800, sales: 2181 },
       { name: 'Sat', value: 3800, sales: 2500 },
     ],
-    []
+    [],
   );
 
   const revenueData = useMemo(
@@ -108,7 +108,7 @@ export default function DashboardPage() {
       { name: 'Q3', value: 48000 },
       { name: 'Q4', value: 61000 },
     ],
-    []
+    [],
   );
 
   const topClients = useMemo(
@@ -123,7 +123,7 @@ export default function DashboardPage() {
           lifetime_value: client.lifetime_value || 0,
           rank: idx + 1,
         })),
-    [clients]
+    [clients],
   );
 
   const topClientsColumns = [
@@ -188,15 +188,13 @@ export default function DashboardPage() {
       <MotionItem className="mb-8">
         <GradientCard gradient="blue" className="relative overflow-hidden">
           <div className="relative z-10">
-            <h1 className="text-3xl font-bold">Welcome back! 👋</h1>
+            <h1 className="text-3xl font-bold">¡Bienvenido de nuevo! 👋</h1>
             <p className="mt-2 text-white/80">
               {session?.user.email
-                ? `Signed in as ${session.user.email}`
-                : "Here's what's happening with your business today"}
+                ? `Conectado como ${session.user.email}`
+                : 'Resumen del estado de tu negocio hoy'}
             </p>
-            {companyId && (
-              <p className="mt-2 text-white/80">Company ID: {companyId}</p>
-            )}
+            {companyId && <p className="mt-2 text-white/80">ID de la empresa: {companyId}</p>}
             <p className="mt-2 text-white/80">Especialización: {specialization}</p>
           </div>
           <motion.div
@@ -211,7 +209,9 @@ export default function DashboardPage() {
         <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 p-4 text-sm text-cyan-100">
           <p className="font-semibold">Vista base compartida</p>
           <p className="mt-1 text-cyan-50/80">
-            Todos los usuarios ingresan al mismo dashboard central. La especialización por rol, módulo o plan se asignará dentro de esta estructura para mantener una experiencia unificada.
+            Todos los usuarios ingresan al mismo dashboard central. La especialización por rol,
+            módulo o plan se asignará dentro de esta estructura para mantener una experiencia
+            unificada.
           </p>
         </div>
       </MotionItem>
@@ -224,10 +224,13 @@ export default function DashboardPage() {
         <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-500/10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Prioridades semanales</p>
+              <p className="text-sm uppercase tracking-[0.3em] text-slate-400">
+                Prioridades semanales
+              </p>
               <h3 className="mt-2 text-2xl font-semibold text-white">Tu próxima ronda de acción</h3>
               <p className="mt-2 max-w-2xl text-sm text-slate-400">
-                Estas recomendaciones ayudan a enfocar el tiempo en los clientes y oportunidades con mayor impacto.
+                Estas recomendaciones ayudan a enfocar el tiempo en los clientes y oportunidades con
+                mayor impacto.
               </p>
             </div>
             <div className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-200">
@@ -294,7 +297,7 @@ export default function DashboardPage() {
           />
           <StatCard
             title="Avg. Order Value"
-            value={`$${((clients.reduce((sum, c) => sum + (c.lifetime_value || 0), 0) / (clients.length || 1)) || 0).toFixed(0)}`}
+            value={`$${(clients.reduce((sum, c) => sum + (c.lifetime_value || 0), 0) / (clients.length || 1) || 0).toFixed(0)}`}
             icon={<ShoppingCart className="h-5 w-5" />}
             subtext="Per transaction"
             delay={0.3}
@@ -356,11 +359,7 @@ export default function DashboardPage() {
       {/* Top Clients Table */}
       <MotionItem className="rounded-lg border border-border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold">Top Clients</h2>
-        <DataTable
-          columns={topClientsColumns}
-          data={topClients}
-          isLoading={isLoading}
-        />
+        <DataTable columns={topClientsColumns} data={topClients} isLoading={isLoading} />
       </MotionItem>
 
       {/* New Client Form */}
