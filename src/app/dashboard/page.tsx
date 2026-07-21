@@ -144,6 +144,30 @@ export default function DashboardPage() {
     },
   ];
 
+  const weeklyFocus = useMemo(() => {
+    const activeClients = clients.filter((client) => Boolean(client.is_active)).length;
+    const totalRevenue = clients.reduce((sum, client) => sum + (client.lifetime_value || 0), 0);
+    const followUps = Math.max(1, Math.min(5, Math.ceil(clients.length / 4)));
+
+    return [
+      {
+        title: 'Aumentar reactivación',
+        description: `${followUps} contactos de seguimiento parecen listos esta semana.`,
+        icon: TrendingUp,
+      },
+      {
+        title: 'Potenciar clientes activos',
+        description: `${activeClients} clientes activos pueden aprovechar un plan de valor adicional.`,
+        icon: Activity,
+      },
+      {
+        title: 'Priorizar ingresos',
+        description: `Tu cartera actual representa $${totalRevenue.toLocaleString()} en valor potencial.`,
+        icon: BarChart3,
+      },
+    ];
+  }, [clients]);
+
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -193,6 +217,44 @@ export default function DashboardPage() {
 
       <MotionItem className="mb-8">
         <QuickActionsPanel />
+      </MotionItem>
+
+      <MotionItem className="mb-8">
+        <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-500/10">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Prioridades semanales</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">Tu próxima ronda de acción</h3>
+              <p className="mt-2 max-w-2xl text-sm text-slate-400">
+                Estas recomendaciones ayudan a enfocar el tiempo en los clientes y oportunidades con mayor impacto.
+              </p>
+            </div>
+            <div className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-4 py-2 text-sm text-cyan-200">
+              {clients.length > 0 ? 'Enfoque activo' : 'Listo para empezar'}
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            {weeklyFocus.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * index }}
+                  className="rounded-2xl border border-white/10 bg-slate-800/60 p-5"
+                >
+                  <div className="mb-4 inline-flex rounded-2xl bg-cyan-500/10 p-3 text-cyan-200">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <p className="font-semibold text-white">{item.title}</p>
+                  <p className="mt-2 text-sm text-slate-400">{item.description}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
       </MotionItem>
 
       <MotionItem className="mb-8">

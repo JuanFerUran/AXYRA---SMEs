@@ -72,6 +72,12 @@ const formatDate = (value?: string | null) => {
     : 'Fecha no disponible';
 };
 
+const quickWins = [
+  'Revisa clientes que están inactivos desde hace más de 60 días.',
+  'Prioriza tus clientes premium para un seguimiento más cercano.',
+  'Activa recordatorios para cumpleaños y nuevas oportunidades.',
+];
+
 export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
@@ -220,7 +226,7 @@ export default function ClientsPage() {
       </MotionItem>
 
       {!hasClients && (
-          <MotionItem variants={itemVariants} className="mb-8 rounded-[2rem] border border-cyan-500/20 bg-linear-to-br from-cyan-500/10 to-fuchsia-500/10 p-8">
+        <MotionItem variants={itemVariants} className="mb-8 rounded-[2rem] border border-cyan-500/20 bg-linear-to-br from-cyan-500/10 to-fuchsia-500/10 p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="max-w-2xl">
               <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-sm text-cyan-200">
@@ -237,6 +243,29 @@ export default function ClientsPage() {
           </div>
         </MotionItem>
       )}
+
+      <MotionItem variants={itemVariants} className="mb-8 rounded-[2rem] border border-white/10 bg-slate-900/70 p-6 shadow-2xl shadow-cyan-500/10">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Resumen ejecutivo</p>
+            <h3 className="mt-2 text-2xl font-semibold text-white">Tu CRM ya está preparado para priorizar acciones</h3>
+            <p className="mt-2 max-w-2xl text-sm text-slate-400">
+              Usa esta vista para detectar oportunidades, mantener clientes activos y mejorar el valor de cada relación.
+            </p>
+          </div>
+          <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-200">
+            {clients.length > 0 ? 'Conectado' : 'Sin clientes aún'}
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 lg:grid-cols-3">
+          {quickWins.map((item) => (
+            <div key={item} className="rounded-2xl border border-white/10 bg-slate-800/60 p-4 text-sm text-slate-300">
+              {item}
+            </div>
+          ))}
+        </div>
+      </MotionItem>
 
       <MotionItem variants={itemVariants} className="grid gap-6 xl:grid-cols-[1.4fr_0.6fr]">
         <div className="grid gap-6">

@@ -7,8 +7,6 @@ const nextConfig: NextConfig = {
   },
   compress: true,
   productionBrowserSourceMaps: false,
-  optimizeFonts: true,
-  swcMinify: true,
   poweredByHeader: false,
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
