@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
+import { useClientStatuses } from '@/features/clients/hooks/useClientStatuses';
 import { ArrowLeft, Mail, Phone, MapPin, CalendarDays, ShieldCheck, RefreshCcw, Activity, Sparkles } from 'lucide-react';
 import type { UpdateClientInput } from '@/features/clients/types/client';
 
@@ -18,6 +20,8 @@ export default function ClientDetailPage() {
   const clientId = typeof params?.id === 'string' ? params.id : null;
   const { client, isLoading, error, fetchClient } = useClient(clientId);
   const { updateClient } = useClients({ autoFetch: false });
+
+  const { statuses, isLoading: statusesLoading } = useClientStatuses();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'history'>('overview');
   const [quickForm, setQuickForm] = useState<UpdateClientInput>({});
@@ -226,7 +230,7 @@ export default function ClientDetailPage() {
                       <p className="mt-3 text-3xl font-semibold">{client?.total_purchases}</p>
                     </div>
                     <div className="rounded-3xl border border-border p-6">
-                      <p className="text-sm text-muted-foreground">Lifetime Value</p>
+                      <p className="text-sm text-muted-foreground">Valor de vida</p>
                       <p className="mt-3 text-3xl font-semibold">${client ? client.lifetime_value.toLocaleString() : '0'}</p>
                     </div>
                   </div>
@@ -338,12 +342,17 @@ export default function ClientDetailPage() {
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
-                        <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
-                        <Input
-                          value={quickForm.client_status_id ?? ''}
-                          onChange={(event) => setQuickForm((prev) => ({ ...prev, client_status_id: event.target.value }))}
-                          placeholder="Active"
-                        />
+                          <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
+                          <Select
+                            value={quickForm.client_status_id ?? ''}
+                            onChange={(event) => setQuickForm((prev) => ({ ...prev, client_status_id: event.target.value }))}
+                            disabled={statusesLoading}
+                          >
+                            <option value="">Selecciona un estado</option>
+                            {statuses.map((s) => (
+                              <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                          </Select>
                       </div>
                       <div>
                         <label className="mb-2 block text-sm font-medium text-slate-700">Activo</label>

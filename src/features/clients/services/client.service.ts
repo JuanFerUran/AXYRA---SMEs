@@ -83,8 +83,8 @@ export class ClientService {
 
     // CSV Export
     const headers = [
-      'ID', 'First Name', 'Last Name', 'Email', 'Phone', 
-      'Total Purchases', 'Lifetime Value', 'Last Purchase', 'Status'
+      'ID', 'Nombre', 'Apellido', 'Correo', 'Teléfono',
+      'Compras totales', 'Valor de vida', 'Última compra', 'Estado'
     ];
     
     const rows = clients.map(client => [
@@ -96,7 +96,7 @@ export class ClientService {
       client.total_purchases,
       client.lifetime_value,
       client.last_purchase_date || '',
-      'Active'
+      (client as any).status?.name ?? ''
     ]);
 
     return [

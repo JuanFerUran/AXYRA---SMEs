@@ -136,11 +136,11 @@ export default function DashboardPage() {
         </span>
       ),
     },
-    { key: 'first_name' as const, label: 'First Name' },
-    { key: 'last_name' as const, label: 'Last Name' },
+    { key: 'first_name' as const, label: 'Nombre' },
+    { key: 'last_name' as const, label: 'Apellido' },
     {
       key: 'lifetime_value' as const,
-      label: 'Lifetime Value',
+      label: 'Valor de vida',
       render: (value: number) => `$${value.toLocaleString()}`,
     },
   ];
@@ -288,7 +288,7 @@ export default function DashboardPage() {
             title="Total Revenue"
             value={`$${clients.reduce((sum, c) => sum + (c.lifetime_value || 0), 0).toLocaleString()}`}
             icon={<TrendingUp className="h-5 w-5" />}
-            subtext="Lifetime value"
+            subtext="Valor de vida"
             trend={12}
             delay={0.2}
           />

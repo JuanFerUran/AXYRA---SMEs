@@ -8,7 +8,9 @@ import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { useClients } from '@/features/clients/hooks/useClients';
+import { useClientStatuses } from '@/features/clients/hooks/useClientStatuses';
 import type { CreateClientInput } from '@/features/clients/types/client';
 
 const defaultClientData: CreateClientInput = {
@@ -26,6 +28,7 @@ const defaultClientData: CreateClientInput = {
 export default function NewClientPage() {
   const router = useRouter();
   const { companyId, isLoading: authLoading } = useSupabaseAuth();
+  const { statuses, isLoading: statusesLoading } = useClientStatuses();
   const { createClient } = useClients({ autoFetch: false });
 
   const [formState, setFormState] = useState<CreateClientInput>({
@@ -159,12 +162,17 @@ export default function NewClientPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
-                  <Input
+                  <Select
                     value={formState.client_status_id}
                     onChange={(event) => handleChange('client_status_id', event.target.value)}
-                    placeholder="Active"
                     required
-                  />
+                    disabled={statusesLoading}
+                  >
+                    <option value="">Selecciona un estado</option>
+                    {statuses.map((s) => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </Select>
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">Valor de vida</label>

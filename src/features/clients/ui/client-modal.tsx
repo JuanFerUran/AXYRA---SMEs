@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import type {
   CreateClientInput,
   UpdateClientInput,
 } from '@/features/clients/types/client';
+import { useClientStatuses } from '@/features/clients/hooks/useClientStatuses';
 
 const defaultFormState: CreateClientInput = {
   company_id: '',
@@ -102,6 +104,7 @@ export function ClientModal({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const { statuses, isLoading: statusesLoading } = useClientStatuses();
 
   useEffect(() => {
     if (open) {
@@ -211,11 +214,17 @@ export function ClientModal({
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
-              <Input
+              <Select
                 value={formState.client_status_id}
                 onChange={(event) => setFormState({ ...formState, client_status_id: event.target.value })}
                 required
-              />
+                disabled={statusesLoading}
+              >
+                <option value="">Selecciona un estado</option>
+                {statuses.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </Select>
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">Valor de vida</label>

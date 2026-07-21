@@ -8,7 +8,9 @@ import { useClients } from '@/features/clients/hooks/useClients';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import type { UpdateClientInput } from '@/features/clients/types/client';
+import { useClientStatuses } from '@/features/clients/hooks/useClientStatuses';
 
 export default function ClientEditPage() {
   const params = useParams();
@@ -21,6 +23,7 @@ export default function ClientEditPage() {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { statuses, isLoading: statusesLoading } = useClientStatuses();
 
   useEffect(() => {
     if (!client) return;
@@ -145,14 +148,20 @@ export default function ClientEditPage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
-                    <Input
+                    <Select
                       value={formState.client_status_id || ''}
                       onChange={(event) => handleChange('client_status_id', event.target.value)}
                       required
-                    />
+                      disabled={statusesLoading}
+                    >
+                      <option value="">Selecciona un estado</option>
+                      {statuses.map((s) => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </Select>
                   </div>
                   <div>
-                    <label className="mb-2 block text-sm font-medium text-slate-700">Lifetime value</label>
+                    <label className="mb-2 block text-sm font-medium text-slate-700">Valor de vida</label>
                     <Input
                       type="number"
                       value={formState.lifetime_value ?? 0}

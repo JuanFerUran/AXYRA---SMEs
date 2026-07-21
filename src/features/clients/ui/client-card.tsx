@@ -55,11 +55,11 @@ export function ClientCard({ client, onEdit, onDelete, onClick, delay = 0 }: Cli
 
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-muted-foreground">Total Purchases</p>
+              <p className="text-xs text-muted-foreground">Compras totales</p>
               <p className="text-lg font-semibold">{client.total_purchases}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Lifetime Value</p>
+              <p className="text-xs text-muted-foreground">Valor de vida</p>
               <p className="text-lg font-semibold">${client.lifetime_value}</p>
             </div>
           </div>

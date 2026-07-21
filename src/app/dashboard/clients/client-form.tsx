@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { useClients } from '@/features/clients/hooks/useClients';
+import { useClientStatuses } from '@/features/clients/hooks/useClientStatuses';
 import type { CreateClientInput } from '@/features/clients/types/client';
 
 const defaultClientData: CreateClientInput = {
@@ -28,6 +30,7 @@ export function ClientForm({ companyId }: { companyId: string }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { statuses, isLoading: statusesLoading } = useClientStatuses();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -97,12 +100,17 @@ export function ClientForm({ companyId }: { companyId: string }) {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">Estado</label>
-              <Input
+              <Select
                 value={client.client_status_id}
                 onChange={(event) => setClient({ ...client, client_status_id: event.target.value })}
-                placeholder="Active"
                 required
-              />
+                disabled={statusesLoading}
+              >
+                <option value="">Selecciona un estado</option>
+                {statuses.map((s) => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </Select>
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-700">Valor de vida</label>
